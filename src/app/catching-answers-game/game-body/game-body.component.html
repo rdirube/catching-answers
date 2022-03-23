@@ -1,0 +1,29 @@
+<div fxFlex="grow" fxLayoutAlign="center center" style="position: relative; background: lightsalmon"> 
+    <div fxFlex="grow" fxFlexFill class="myAbsolute" fxLayout="column">
+        <mlc-loaded-svg fxFlex="grow" class="myAbsolute" forceViewBoxTo="''"
+        path="mini-lessons/executive-functions/catching-answers/game/svg/fondo.svg">
+      </mlc-loaded-svg>
+      <div fxLayoutAlign="space-between center" style="width:100%; height:13vh; z-index: 10;">
+        <mlc-to-in-game-menu-button [forceNoAnimations]="true" style="width: 13vh;"
+         svgPath="mini-lessons/executive-functions/catching-answers/game/svg/Boton-home.svg">
+       </mlc-to-in-game-menu-button>
+       <mlc-hint-button style="width: 13vh; opacity: 1;"
+         svgPath="mini-lessons/executive-functions/catching-answers/game/svg/Boton-pista.svg">
+       </mlc-hint-button> 
+     </div>
+    <div fxLayoutAlign="center center" class="myAbsolute"  style="width:100;height: 52vh;">
+      <mlc-loaded-svg style="width: 70vh; height: 65vh;transform: translateX(11vh);" forceViewBoxTo="''"
+      path="mini-lessons/executive-functions/catching-answers/game/svg/submarino.svg">
+    </mlc-loaded-svg>
+     </div>
+
+     <div style="position: absolute; width: 100%;">
+      <mlc-footer class="button-menu" style=" width: 97.5%; height: 12vh;"
+        trySvg="mini-lessons/executive-functions/catching-answers/game/svg/Boton-correcto.svg"
+        surrenderSvg="mini-lessons/executive-functions/catching-answers/game/svg/Boton-rendirse.svg"
+        resultsSvg="mini-lessons/executive-functions/catching-answers/game/svg/Boton-copa.svg"
+        nextSvg="mini-lessons/executive-functions/catching-answers/game/svg/Boton-flecha  .svg"></mlc-footer>
+    </div>
+     </div>
+    
+</div>
