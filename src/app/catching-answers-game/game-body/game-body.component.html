@@ -1,5 +1,5 @@
 <div fxFlex="grow" fxLayoutAlign="center center" style="position: relative; background: lightsalmon"> 
-    <div fxFlex="grow" fxFlexFill class="myAbsolute" fxLayout="column">
+    <div fxFlex="grow" fxFlexFill class="myAbsolute" fxLayout="column">    
         <mlc-loaded-svg fxFlex="grow" class="myAbsolute" forceViewBoxTo="''"
         path="mini-lessons/executive-functions/catching-answers/game/svg/fondo.svg">
       </mlc-loaded-svg>
@@ -11,13 +11,19 @@
          svgPath="mini-lessons/executive-functions/catching-answers/game/svg/Boton-pista.svg">
        </mlc-hint-button> 
      </div>
+     <div style="width: 100%; height: 100%; position: absolute; z-index: 50;" fxLayout="row">
+      <app-bubble-route style="width: 100%;" *ngFor="let bubble of bubbles" [bubble]="bubble"></app-bubble-route>
+    </div>
     <div fxLayoutAlign="center center" class="myAbsolute"  style="width:100;height: 52vh;">
-      <mlc-loaded-svg style="width: 70vh; height: 65vh;transform: translateX(11vh);" forceViewBoxTo="''"
+      <mlc-loaded-svg style="width: 70vh; height: 65vh;transform: translateX(26vh);" forceViewBoxTo="''"
       path="mini-lessons/executive-functions/catching-answers/game/svg/submarino.svg">
     </mlc-loaded-svg>
+    <div style="z-index: 30;transform: translate(-41.5vh, 0.5vh); width: 29.5vh; height: 16vh;" fxLayoutAlign="center center">
+    <ox-text [originalText]="statement"  fontSize="2.7vh" color="white" font="dinnRegular"></ox-text>
+    </div>
      </div>
-
-     <div style="position: absolute; width: 100%;">
+     
+     <div style=" width: 100%; bottom: 0; position: absolute;">
       <mlc-footer class="button-menu" style=" width: 97.5%; height: 12vh;"
         trySvg="mini-lessons/executive-functions/catching-answers/game/svg/Boton-correcto.svg"
         surrenderSvg="mini-lessons/executive-functions/catching-answers/game/svg/Boton-rendirse.svg"
