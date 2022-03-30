@@ -8,12 +8,16 @@ import { Bubble } from 'src/app/shared/types/types';
 })
 export class BubbleComponent implements OnInit {
 
+  
+
+
   @Input() bubble!:Bubble; 
 
 
   constructor() { }
 
   ngOnInit(): void {
+    console.log(this.bubble);
   }
 
 }

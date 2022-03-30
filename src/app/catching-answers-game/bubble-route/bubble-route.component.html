@@ -1,6 +1,6 @@
 
-<div fxLayoutAlign="center end" style="height: 100%;"> 
-    <div #bubbleContainer>
-  <app-bubble style="width: 100%;" [bubble]="bubble"></app-bubble>
+<div fxLayoutAlign="center end" style="height: 140%;"> 
+    <div #bubbleContainer (click)="selectBubble()">
+  <app-bubble style="width: 100%;" [bubble]="currentBubble" ></app-bubble>
   </div>
 </div>
