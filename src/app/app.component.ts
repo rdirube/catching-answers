@@ -61,7 +61,7 @@ export class AppComponent extends BaseMicroLessonApp {
 protected getGameResourcesToLoad(): ResourceOx[] {
   const svgElements: string[] = ['Boton-congelar.svg', 'Boton-copa.svg', 'Boton-correcto.svg', 'Boton-incorrecto.svg', 'Boton-descongelar.svg', 
   'Boton-flecha.svg', 'Boton-home.svg', 'Boton-pista.svg','Boton-rendirse.svg', 'Boton-sonido-submarino', 'burbuja.svg', 'burbuja-correcto.svg',
-'burbuja-incorrecto', 'burbuja-seleccion', 'fondo.svg', 'submarino.svg'];
+'burbuja-incorrecto.svg','burbuja-blanca.svg' ,'burbuja-seleccion.svg', 'fondo.svg', 'submarino.svg'];
 
 return svgElements.map(x => new ResourceOx('mini-lessons/executive-functions/catching-answers/game/svg/' + x, ResourceType.Svg,
 [ScreenTypeOx.Game], true))

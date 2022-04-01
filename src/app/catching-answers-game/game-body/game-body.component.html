@@ -12,7 +12,7 @@
        </mlc-hint-button> 
      </div>
      <div style="width: 100%; height: 100%; position: absolute; z-index: 50;" fxLayout="row">
-      <app-bubble-route style="width: 100%;" *ngFor="let route of routeArray; let i = index" [bubbleSpeed]="bubblesSpeed" [animationIndex]="animationIndexes[i]" [bubbles]="bubbles" fxLayoutAlign="center center"></app-bubble-route>
+      <app-bubble-route style="width: 100%;" *ngFor="let route of routeArray; let i = index" [i]="i" [bubbleSpeed]="bubblesSpeed" [animationIndex]="animationIndexes[i]" [bubble]="bubbleGenerator.bubbleGame[i]" fxLayoutAlign="center center"></app-bubble-route>
     </div>
     <div fxLayoutAlign="center center" class="myAbsolute"  style="width:100;height: 52vh;">
       <mlc-loaded-svg style="width: 70vh; height: 65vh;transform: translateX(26vh);" forceViewBoxTo="''"
