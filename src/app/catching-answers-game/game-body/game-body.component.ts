@@ -8,7 +8,7 @@ import { filter, take } from 'rxjs';
 import { CatchingAnswersAnswerService } from 'src/app/shared/services/catching-answers-answer.service';
 import { CatchingAnswersChallengeService } from 'src/app/shared/services/catching-answers-challenge.service';
 import { CatchingAnswersComposeService } from 'src/app/shared/services/catching-answers-compose.service';
-import { Bubble, ANIMATION_PROPERTIES, DELAYS, CatchingAnswersExercise, BubbleCreator, BubbleGenerator } from 'src/app/shared/types/types';
+import { Bubble, ANIMATION_PROPERTIES, DELAYS, CatchingAnswersExercise, BubbleCreator, BubbleGenerator, Replacement, } from 'src/app/shared/types/types';
 
 @Component({
   selector: 'app-game-body',
@@ -22,6 +22,7 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
 
 
   public bubbles!: Bubble[];
+  public bubbleGame!:Bubble[];
   public statement!: string;
   public bubblesSpeed!: number;
   public animationIndexes!: number[];
@@ -56,15 +57,16 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
         const allAnswersCorrect = this.allAnswersCorrect();
         if (this.metricsService.currentMetrics.expandableInfo?.exercisesData.length as number > 1 && !allAnswersCorrect) {
           return;
-        } else {
-         
+        } else {       
           this.composeService.composeEvent.emit();
           this.nextExercise(exercise.exerciseData);
           this.answerPerExercise = this.exercise.exercise.bubble.filter(bubble => bubble.isAnswer);
           this.challengeService.exerciseIndex++;
-
         }
       })
+     
+      
+
   }
  
 
@@ -79,7 +81,6 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
         data: bubble.content.text,
         isAnswer: bubble.isAnswer,
         state: 'neutral',
-        route: i
       }
     });
     this.bubbleGenerator = new BubbleGenerator(this.bubbles, this.routeArray);
@@ -102,11 +103,21 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
   }
 
 
+  public bubbleReplacement(replacement:Replacement) {
+    this.bubbleGenerator.bubbleReplacement(replacement);
+  }
+
+
 
   allAnswersCorrect(): boolean {
     return this.answerPerExercise.length === this.challengeService.correctAnswersPerExercise.length
   }
 
+
+  removeCorrect(removedBubble:Bubble) {
+    const removedIndex = this.bubbleGenerator.bubbles.findIndex(b => b === removedBubble);
+    this.bubbleGenerator.bubbles.splice(removedIndex,1);
+  }
 
 
   private addMetric(): void {
