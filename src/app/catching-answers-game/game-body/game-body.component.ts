@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, EventEmitter, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, OnInit, ViewChild } from '@angular/core';
 import { SubscriberOxDirective } from 'micro-lesson-components';
 import { EndGameService, FeedbackOxService, GameActionsService, HintService, MicroLessonMetricsService, SoundOxService } from 'micro-lesson-core';
 import { ComposeAnimGenerator } from 'ox-animations';
@@ -18,6 +18,7 @@ import { Bubble, ANIMATION_PROPERTIES, DELAYS, CatchingAnswersExercise, BubbleCr
 
 export class GameBodyComponent extends SubscriberOxDirective implements OnInit, AfterViewInit {
 
+  @ViewChild('routesContainer') routesContainer!: ElementRef;
 
 
 
@@ -32,7 +33,7 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
   public routeQuantity!:number; 
   public answerPerExercise:BubbleCreator[] = [];
   public bubbleGenerator!:BubbleGenerator;
-
+  private restart!:boolean;
 
   constructor(private challengeService: CatchingAnswersChallengeService,
     private metricsService: MicroLessonMetricsService<any>,
@@ -47,23 +48,34 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
     this.composeService.setSubscriptions(this.composeService.composeEvent, false)
     this.hintService.usesPerChallenge = 2;
     this.bubblesSpeed = 10000;
-    this.composeService.decomposeTime = 650;
-    this.composeService.composeTime = 650;
-
+    this.composeService.decomposeTime = 950;
+    this.composeService.composeTime = 950;
+    this.restart = false;
     this.animationIndexes = shuffle(ANIMATION_PROPERTIES.map((x, i) => i));
+    this.addSubscription(this.gameActions.restartGame, x => {
+      this.challengeService.exerciseIndex = 0;
+    })
     this.addSubscription(this.challengeService.currentExercise.pipe(filter(x => x !== undefined)),
       (exercise: ExerciseOx<CatchingAnswersExercise>) => {
         this.addMetric();
         const allAnswersCorrect = this.allAnswersCorrect();
         if (this.metricsService.currentMetrics.expandableInfo?.exercisesData.length as number > 1 && !allAnswersCorrect) {
           return;
-        } else {       
-          this.composeService.composeEvent.emit();
-          this.nextExercise(exercise.exerciseData);
-          this.answerPerExercise = this.exercise.exercise.bubble.filter(bubble => bubble.isAnswer);
-          this.challengeService.exerciseIndex++;
+        } else {
+          this.exercise = exercise.exerciseData;
+          if(this.challengeService.exerciseIndex > 0) {
+            this.composeService.composeEvent.emit();
+          } else if (this.challengeService.exerciseIndex === 0) {
+            this.nextExercise()
+
+          }
+          
         }
       })
+      this.addSubscription(this.composeService.composablesObjectsOut, x => {       
+        this.nextExercise()
+      })
+
      
       
 
@@ -71,8 +83,9 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
  
 
 
-  nextExercise(exercise: CatchingAnswersExercise) {
-    this.exercise = exercise;
+  nextExercise() {
+    this.challengeService.exerciseIndex++;
+    this.answerPerExercise = this.exercise.exercise.bubble.filter(bubble => bubble.isAnswer);
     this.challengeService.correctAnswersPerExercise = [];
     this.routeArray = Array.from(Array(4).keys());
     this.statement = this.exercise.exercise.statement.text!;
@@ -95,6 +108,8 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
 
 
   ngAfterViewInit(): void {
+    this.composeService.addComposable(this.routesContainer.nativeElement, ComposeAnimGenerator.fromBot(), ComposeAnimGenerator.toTop(), false);
+
   }
 
 

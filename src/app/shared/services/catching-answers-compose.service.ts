@@ -16,9 +16,8 @@ export class CatchingAnswersComposeService extends ComposeService<CatchingAnswer
   constructor(challengeService: ChallengeService<CatchingAnswersExercise,any>, soundService: SoundOxService, 
     gameActions: GameActionsService<any>)  
   {
-    super(challengeService, soundService, gameActions);
-
-   
- 
+    super(challengeService, soundService, gameActions); 
   }
+
+  
 }

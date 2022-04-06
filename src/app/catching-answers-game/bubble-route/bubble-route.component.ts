@@ -24,7 +24,15 @@ export class BubbleRouteComponent extends SubscriberOxDirective implements OnIni
   @Input() routeWidth!: number;
   @Input() bubbles!: Bubble;
 
-  @Input() bubble!: Bubble;
+  @Input() set  bubbleSetter (bubble : Bubble) {
+     this.bubble = bubble;
+     console.log(this.bubble);
+     if(this.bubbleContainer) {
+      this.bubbleAnimation = new BubbleAnimation(this.bubbleSpeed, this.bubbleAnimationState, this.animationIndex, ANIMATION_PROPERTIES, DELAYS, this.bubble, this.routeIndex,this.bubbleContainer)
+      this.bubbleAnimation.bubbleAnimation(this.newBubbleEmitter)
+     }
+  } 
+
   @Input() routeIndex!: number;
   @Input() bubbleSpeed!: number;
   @Input() animationIndex!: number;
@@ -35,7 +43,7 @@ export class BubbleRouteComponent extends SubscriberOxDirective implements OnIni
   private isSelected!:boolean;
   public bubbleAnimation!: BubbleAnimation;
   public currentBubbles!: Bubble[];
-
+  public bubble!:Bubble;
   
   constructor(private gameActions: GameActionsService<any>,
   private answerService: CatchingAnswersAnswerService,
@@ -63,7 +71,6 @@ export class BubbleRouteComponent extends SubscriberOxDirective implements OnIni
   ngAfterViewInit(): void {
     this.bubbleAnimation = new BubbleAnimation(this.bubbleSpeed, this.bubbleAnimationState, this.animationIndex, ANIMATION_PROPERTIES, DELAYS, this.bubble, this.routeIndex,this.bubbleContainer)
     this.bubbleAnimation.bubbleAnimation(this.newBubbleEmitter);
-    this.composeService.addComposable(this.bubbleContainer.nativeElement, ComposeAnimGenerator.fromBot(), ComposeAnimGenerator.toTop(), false);
   }
 
 

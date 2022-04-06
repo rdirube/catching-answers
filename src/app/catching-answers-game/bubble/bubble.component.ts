@@ -9,9 +9,13 @@ import { Bubble } from 'src/app/shared/types/types';
 export class BubbleComponent implements OnInit {
 
   
+  public bubble!:Bubble;
 
 
-  @Input() bubble!:Bubble; 
+  @Input() set  bubbleSetter (bubble : Bubble) {
+    this.bubble = bubble;
+    console.log(this.bubble);
+ } 
 
 
   constructor() { }

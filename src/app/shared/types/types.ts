@@ -148,7 +148,6 @@ export class BubbleAnimation {
           route: this.routeIndex
         })
         console.log(this.bubble);
-        this.bubbleAnimation(newBubble);
       } 
     })
     this.bubbleAnimationState.play();
@@ -213,7 +212,6 @@ export class BubbleGenerator {
 
     } 
     this.bubbleGame.splice(replacement.route,1,bubbleToAdd);
-    console.log(this.bubbleGame);
   }
 
   
