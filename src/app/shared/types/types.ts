@@ -147,7 +147,6 @@ export class BubbleAnimation {
           lastBubble:this.bubble,
           route: this.routeIndex
         })
-        console.log(this.bubble);
       } 
     })
     this.bubbleAnimationState.play();
@@ -209,9 +208,10 @@ export class BubbleGenerator {
       } else {
         this.bubbleAnswerInGame.push(bubbleToAdd);
       }
-
-    } 
+    }
+    bubbleToAdd.state = 'neutral'; 
     this.bubbleGame.splice(replacement.route,1,bubbleToAdd);
+    console.log(this.bubbleGame);
   }
 
   

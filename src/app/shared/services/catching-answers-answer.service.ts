@@ -9,7 +9,7 @@ import { CatchingAnswersChallengeService } from './catching-answers-challenge.se
 export class CatchingAnswersAnswerService extends AnswerService {
 
   protected override isValidAnswer(answer: UserAnswer): boolean {
-    return this.currentAnswer.parts.every(part => part.parts.every(part => part.value === 'selected'))
+    return this.currentAnswer.parts.every(part => part.parts.every(part => part.value !== null))
   }
   
 

@@ -9,7 +9,8 @@ import { CatchingAnswersExercise } from '../types/types';
 export class CatchingAnswersComposeService extends ComposeService<CatchingAnswersExercise> {
 
 
-  public animationTrigger = new EventEmitter<any>()
+  public animationTrigger = new EventEmitter<any>() 
+  public bubbleRestoreAnimation = new EventEmitter<any>() 
   public composeEvent = new EventEmitter<{ composeInZero: boolean }>();
 
 

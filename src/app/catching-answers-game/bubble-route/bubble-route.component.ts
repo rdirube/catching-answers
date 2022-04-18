@@ -26,16 +26,17 @@ export class BubbleRouteComponent extends SubscriberOxDirective implements OnIni
 
   @Input() set  bubbleSetter (bubble : Bubble) {
      this.bubble = bubble;
-     console.log(this.bubble);
      if(this.bubbleContainer) {
       this.bubbleAnimation = new BubbleAnimation(this.bubbleSpeed, this.bubbleAnimationState, this.animationIndex, ANIMATION_PROPERTIES, DELAYS, this.bubble, this.routeIndex,this.bubbleContainer)
       this.bubbleAnimation.bubbleAnimation(this.newBubbleEmitter)
      }
   } 
+  
 
   @Input() routeIndex!: number;
   @Input() bubbleSpeed!: number;
   @Input() animationIndex!: number;
+  @Input() answerPerExercise!: number;
   @Output() newBubbleEmitter = new EventEmitter<Replacement>();
   @Output() removeCorrect = new EventEmitter<Bubble>()
 
@@ -49,7 +50,8 @@ export class BubbleRouteComponent extends SubscriberOxDirective implements OnIni
   private answerService: CatchingAnswersAnswerService,
   private feedBackService: FeedbackOxService,
   private challengeService: CatchingAnswersChallengeService,
-  private composeService: CatchingAnswersComposeService) {
+  private composeService:CatchingAnswersComposeService
+) {
   super();
   this.isSelected = false;
     this.addSubscription(this.gameActions.checkedAnswer, x => {
@@ -57,13 +59,19 @@ export class BubbleRouteComponent extends SubscriberOxDirective implements OnIni
         this.answerCorrection()
       }
     })
+
+    this.addSubscription(this.composeService.bubbleRestoreAnimation, x => {
+      this.restoreBubbles();
+    })
   }
+
 
 
 
 
   ngOnInit(): void {
   }
+
 
 
 
@@ -77,54 +85,45 @@ export class BubbleRouteComponent extends SubscriberOxDirective implements OnIni
 
 
 
-  public correctablePart(): void {
-    const correctablePart =
-      [{
-        correctness: (this.bubble.isAnswer ? 'correct' : 'wrong') as PartCorrectness,
-        parts: 
-        [{
-            format: 'word-text' as PartFormat,
-            value: this.bubble.state as BubbleState
-        }]
-      }]
-    this.answerService.currentAnswer = {
-      parts: correctablePart as CorrectablePart[]
-    }
-    this.gameActions.actionToAnswer.emit();
-  }
-
-
-
-
   public selectBubble() {
-    if (this.bubble.state === 'selected') {
-      this.bubble.state = 'neutral'
-      this.bubbleAnimation.bubbleAnimationState.play();
-    } else {
-      this.bubble.state = 'selected'
-      this.bubbleAnimation.bubbleAnimationState.pause();
-    }
-    this.correctablePart();
+    if(this.bubble.state !== 'correct') {
+      if (this.bubble.state === 'selected') {
+        this.bubble.state = 'neutral'
+        this.bubbleAnimation.bubbleAnimationState.play();
+      } else {
+        this.bubble.state = 'selected'
+        this.bubbleAnimation.bubbleAnimationState.pause();
+        this.challengeService.actionToAnswerEmit.emit();
+      }
+    } 
   }
 
 
 
 
-  private answerCorrection() {
+
+  private answerCorrection():void {
     this.bubble.state = this.bubble.isAnswer ? 'correct' : 'incorrect';
-    this.feedBackService.endFeedback.emit();
     if (this.bubble.state === 'incorrect') {
       this.bubbleAnimation.bubbleAnimationState.play();
     } else {
-      this.removeCorrect.emit(this.bubble)
-      // const bubbleCorrectIndex = this.currentBubbles.findIndex(bubble => bubble.data === this.bubble.data)
-      // 
-      
+      this.removeCorrect.emit(this.bubble);
       this.challengeService.correctAnswersPerExercise.push(this.bubble);
-      console.log(this.challengeService.correctAnswersPerExercise);
+      if(this.challengeService.correctAnswersPerExercise.length >= this.answerPerExercise) {
+        this.feedBackService.endFeedback.emit();
+      }
     }
   }
 
+
+  
+  private restoreBubbles():void {
+    anime({
+      targets: this.bubbleContainer.nativeElement,
+      translateY: '0',
+      duration:0   
+    })
+  }
 
 
 

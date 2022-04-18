@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import { AppInfoOxService, ChallengeService, FeedbackOxService, GameActionsService, LevelService, SubLevelService } from 'micro-lesson-core';
 import { ExerciseOx, PreloaderOxService } from 'ox-core';
 import { duplicateWithJSON, ExpandableInfo } from 'ox-types';
@@ -17,13 +17,12 @@ export class CatchingAnswersChallengeService extends ChallengeService<CatchingAn
 //   }
 
   public exerciseConfig!: CatchingAnswersNivelation;
-  public exerciseIndex!:number;
   public correctAnswersPerExercise:Bubble[] = [];
-
+  public correctAnswerQuantity:number = 0;
+  actionToAnswerEmit = new EventEmitter();
 
 
   protected generateNextChallenge(subLevel: number): ExerciseOx<CatchingAnswersExercise> {
-  
    const exercise = duplicateWithJSON({
     exercise: this.exerciseConfig.exercises[this.exerciseIndex].exercise
   })
@@ -80,7 +79,7 @@ export class CatchingAnswersChallengeService extends ChallengeService<CatchingAn
       case 'created-config':
         this.currentSubLevelPregeneratedExercisesNeeded = 1;
         // this.exerciseConfig = this.getExerciseConfig();
-        this.exerciseConfig = JSON.parse('{"supportedLanguages":{"es":true,"en":false},"isPublic":false,"ownerUid":"oQPbggIFzLcEHuDjp5ZNbkkVOlZ2","uid":"dUKr5JJrsVDOD47oscop","inheritedPedagogicalObjectives":[],"customTextTranslations":{"es":{"name":{"text":""},"description":{"text":""},"previewData":{"path":""}}},"backupReferences":"","type":"mini-lesson","libraryItemType":"resource","tagIds":{},"properties":{"customConfig":{"customMedia":[],"creatorInfo":{"metricsType":"results","creatorType":"catching-answers","type":"challenges","screenTheme":"executive-functions","exerciseCount":2,"microLessonGameInfo":{"exercises":[{"exercise":{"statement":{"text":"Selecciona burbuja","audio":"","image":"","video":""},"bubbleQuantity":"4","bubble":[{"content":{"text":"hola","audio":"","video":"","image":""},"isAnswer":false},{"content":{"text":"chau","audio":"","video":"","image":""},"isAnswer":true},{"content":{"text":"como","audio":"","video":"","image":""},"isAnswer":true},{"content":{"text":"va","audio":"","video":"","image":""},"isAnswer":false},{"content":{"text":"termo","audio":"","video":"","image":""},"isAnswer":false},{"content":{"text":"ping-pong","audio":"","video":"","image":""},"isAnswer":true}]}},{"exercise":{"statement":{"text":"Selecciona siguiente burbujinha","audio":"","image":"","video":""},"bubbleQuantity":"4","bubble":[{"content":{"text":"mesa","audio":"","video":"","image":""},"isAnswer":false},{"content":{"text":"Media","audio":"","video":"","image":""},"isAnswer":true},{"content":{"text":"Mouse","audio":"","video":"","image":""},"isAnswer":false}, {"content":{"text":"Celular","audio":"","video":"","image":""},"isAnswer":true}]}}]}}},"format":"catching-answers","miniLessonVersion":"with-custom-config-v2","miniLessonUid":"","url":"https://ml-screen-manager.firebaseapp.com"}}').properties.customConfig.creatorInfo.microLessonGameInfo;
+        this.exerciseConfig = JSON.parse('{"supportedLanguages":{"es":true,"en":false},"isPublic":false,"ownerUid":"oQPbggIFzLcEHuDjp5ZNbkkVOlZ2","uid":"dUKr5JJrsVDOD47oscop","inheritedPedagogicalObjectives":[],"customTextTranslations":{"es":{"name":{"text":""},"description":{"text":""},"previewData":{"path":""}}},"backupReferences":"","type":"mini-lesson","libraryItemType":"resource","tagIds":{},"properties":{"customConfig":{"customMedia":[],"creatorInfo":{"metricsType":"results","creatorType":"catching-answers","type":"challenges","screenTheme":"executive-functions","exerciseCount":3,"microLessonGameInfo":{"exercises":[{"exercise":{"statement":{"text":"T0","audio":"","image":"","video":""},"bubbleQuantity":"4","bubble":[{"content":{"text":"1","audio":"","video":"","image":""},"isAnswer":true},{"content":{"text":"2","audio":"","video":"","image":""},"isAnswer":false},{"content":{"text":"3","audio":"","video":"","image":""},"isAnswer":false},{"content":{"text":"4","audio":"","video":"","image":""},"isAnswer":true}]}},{"exercise":{"statement":{"text":"T1","audio":"","image":"","video":""},"bubbleQuantity":"4","bubble":[{"content":{"text":"5","audio":"","video":"","image":""},"isAnswer":true},{"content":{"text":"6","audio":"","video":"","image":""},"isAnswer":false},{"content":{"text":"7","audio":"","video":"","image":""},"isAnswer":false},{"content":{"text":"8","audio":"","video":"","image":""},"isAnswer":true}]}},{"exercise":{"statement":{"text":"T2","audio":"","image":"","video":""},"bubbleQuantity":"4","bubble":[{"content":{"text":"9","audio":"","video":"","image":""},"isAnswer":true},{"content":{"text":"10","audio":"","video":"","image":""},"isAnswer":false},{"content":{"text":"11","audio":"","video":"","image":""},"isAnswer":false},{"content":{"text":"12","audio":"","video":"","image":""},"isAnswer":true}]}}]}},"extraInfo":{"gameUrl":"","theme":"valle ","language":"ESP","exerciseCase":"created"}},"format":"catching-answers","miniLessonVersion":"with-custom-config-v2","miniLessonUid":"","url":"https://ml-screen-manager.firebaseapp.com"}}').properties.customConfig.creatorInfo.microLessonGameInfo;
         console.log(this.exerciseConfig);
         break;
       default:
