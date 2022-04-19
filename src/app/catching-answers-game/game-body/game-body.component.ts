@@ -4,7 +4,7 @@ import { EndGameService, FeedbackOxService, GameActionsService, HintService, Mic
 import { ComposeAnimGenerator } from 'ox-animations';
 import { ExerciseOx } from 'ox-core';
 import { anyElement, CorrectablePart, duplicateWithJSON, ExerciseData, MultipleChoiceSchemaData, PartCorrectness, PartFormat, shuffle } from 'ox-types';
-import { filter, take } from 'rxjs';
+import { filter, take, timer } from 'rxjs';
 import { CatchingAnswersAnswerService } from 'src/app/shared/services/catching-answers-answer.service';
 import { CatchingAnswersChallengeService } from 'src/app/shared/services/catching-answers-challenge.service';
 import { CatchingAnswersComposeService } from 'src/app/shared/services/catching-answers-compose.service';
@@ -23,17 +23,19 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
 
 
   public bubbles!: Bubble[];
-  public bubbleGame!:Bubble[];
+  public bubbleGame!: Bubble[];
   public statement!: string;
   public bubblesSpeed!: number;
   public animationIndexes!: number[];
   public delayList!: number[];
   public exercise!: CatchingAnswersExercise;
   public routeArray!: number[];
-  public routeQuantity!:number; 
-  public answerPerExercise:BubbleCreator[] = [];
-  public bubbleGenerator!:BubbleGenerator;
-  private restart!:boolean;
+  public routeQuantity!: number;
+  public answerPerExercise: BubbleCreator[] = [];
+  public bubbleGenerator!: BubbleGenerator;
+  public overExercise!: boolean;
+  public stopAnimation!:boolean;
+
 
   constructor(private challengeService: CatchingAnswersChallengeService,
     private metricsService: MicroLessonMetricsService<any>,
@@ -50,36 +52,44 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
     this.bubblesSpeed = 10000;
     this.composeService.decomposeTime = 950;
     this.composeService.composeTime = 950;
-    this.restart = false;
     this.animationIndexes = shuffle(ANIMATION_PROPERTIES.map((x, i) => i));
     this.addSubscription(this.challengeService.currentExercise.pipe(filter(x => x !== undefined)),
       (exercise: ExerciseOx<CatchingAnswersExercise>) => {
         this.addMetric();
+        const exerciseIndex = this.metricsService.currentMetrics.expandableInfo?.exercisesData.length as number;
         const allAnswersCorrect = this.allAnswersCorrect();
-        if (this.metricsService.currentMetrics.expandableInfo?.exercisesData.length as number > 1 && !allAnswersCorrect) {
-          return;
-        } else {
-          this.exercise = exercise.exerciseData;
-          if(this.metricsService.currentMetrics.expandableInfo?.exercisesData.length as number > 0) {
-            this.composeService.composeEvent.emit();
-          } else if (this.metricsService.currentMetrics.expandableInfo?.exercisesData.length as number === 0) {
+        this.overExercise = false;
+        this.composeService.bubbleRestoreAnimation.emit();
+        this.challengeService.removeAnimation.emit();
+        this.exercise = exercise.exerciseData;
+          if (exerciseIndex === 1) {
             this.nextExercise()
           }
-        }
+          if (exerciseIndex > 1) {
+            if (!allAnswersCorrect) {
+              return
+            } else {
+              this.composeService.composeEvent.emit();
+              this.challengeService.removeAnimation.emit();
+            }
+          }
+        
       })
-      this.addSubscription(this.composeService.composablesObjectsOut, x => {       
-        this.composeService.bubbleRestoreAnimation.emit();
-        this.nextExercise();
-      })
-      this.addSubscription(this.challengeService.actionToAnswerEmit, x => {
-        this.correctablePart();
-      })
+    this.addSubscription(this.composeService.composablesObjectsOut, x => {
+      this.composeService.bubbleRestoreAnimation.emit();
+      this.nextExercise();
+    
 
-     
-      
+    })
+    this.addSubscription(this.challengeService.actionToAnswerEmit, x => {
+      this.correctablePart();
+    })
+
+
+
 
   }
- 
+
 
 
   nextExercise() {
@@ -94,7 +104,7 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
         state: 'neutral',
       }
     });
-    this.bubbleGenerator = new BubbleGenerator(this.bubbles, this.routeArray);
+    this.bubbleGenerator = new BubbleGenerator(this.bubbles, this.routeArray, this.overExercise);
     this.bubbleGenerator.initialBubbleGenerator();
   }
 
@@ -116,7 +126,7 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
   }
 
 
-  public bubbleReplacement(replacement:Replacement) {
+  public bubbleReplacement(replacement: Replacement) {
     this.bubbleGenerator.bubbleReplacement(replacement);
   }
 
@@ -127,17 +137,17 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
   }
 
 
-  removeCorrect(removedBubble:Bubble) {
+  removeCorrect(removedBubble: Bubble) {
     const removedIndex = this.bubbleGenerator.bubbles.findIndex(b => b === removedBubble);
-    this.bubbleGenerator.bubbles.splice(removedIndex,1);
+    this.bubbleGenerator.bubbles.splice(removedIndex, 1);
   }
 
-  
+
 
 
   public correctablePart(): void {
     const answersArray = duplicateWithJSON(this.bubbles).filter(el => el.isAnswer);
-    const selectedBubbles =  this.bubbles.filter(el => el.state === 'correct').concat(this.bubbles.filter(el => el.state === 'selected'));
+    const selectedBubbles = this.bubbles.filter(el => el.state === 'correct').concat(this.bubbles.filter(el => el.state === 'selected'));
     const correctablePart = answersArray.map((ans, i) => {
       const correctnessToReturn = selectedBubbles[i] ? selectedBubbles[i].data : '';
       return {
@@ -154,7 +164,7 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
       parts: correctablePart as CorrectablePart[]
     }
   }
-  
+
 
 
   private addMetric(): void {

@@ -105,10 +105,10 @@ export class BubbleAnimation {
   private delayArray!:number[];
   private bubble!:Bubble;
   private routeIndex!:number;
+  private isFinished!:boolean
 
 
-
-  constructor(bubbleSpeed: number, bubbleAnimationState: any, animationIndex: number, animationProperties: AnimationProperties[], delayArray:number[], bubble:Bubble, routeIndex:number, bubbleContainer?: ElementRef) {
+  constructor(bubbleSpeed: number, bubbleAnimationState: any, animationIndex: number, animationProperties: AnimationProperties[], delayArray:number[], bubble:Bubble, routeIndex:number, isFinished:boolean ,bubbleContainer?: ElementRef) {
     this.bubbleSpeed = bubbleSpeed;
     this.bubbleAnimationState = bubbleAnimationState;
     this.bubbleContainer = bubbleContainer;
@@ -116,7 +116,8 @@ export class BubbleAnimation {
     this.animationIndex = animationIndex;
     this.delayArray = delayArray;
     this.bubble = bubble;
-    this.routeIndex = routeIndex
+    this.routeIndex = routeIndex;
+    this.isFinished = isFinished;
   }
 
 
@@ -143,10 +144,11 @@ export class BubbleAnimation {
           translateY: '0',
           duration:0
         })
-        newBubble.emit({
-          lastBubble:this.bubble,
-          route: this.routeIndex
-        })
+          newBubble.emit({
+            lastBubble:this.bubble,
+            route: this.routeIndex
+          })
+        
       } 
     })
     this.bubbleAnimationState.play();
@@ -165,11 +167,13 @@ export class BubbleGenerator {
   public bubbleGame:Bubble[] = [];
   public routeArray!:number[];
   private bubbleAnswerInGame:Bubble[] = [];
+  public init!:boolean;
 
 
-  constructor(bubbles:Bubble[],routeArray:number[]) {
+  constructor(bubbles:Bubble[],routeArray:number[], init:boolean) {
     this.bubbles = bubbles;
     this.routeArray = routeArray;
+    this.init = init
   }
 
 
@@ -209,10 +213,10 @@ export class BubbleGenerator {
         this.bubbleAnswerInGame.push(bubbleToAdd);
       }
     }
-    bubbleToAdd.state = 'neutral'; 
+    bubbleToAdd.state = 'neutral' 
     this.bubbleGame.splice(replacement.route,1,bubbleToAdd);
-    console.log(this.bubbleGame);
-  }
+    } 
+  
 
   
 

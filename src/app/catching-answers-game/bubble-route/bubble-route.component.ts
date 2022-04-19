@@ -23,11 +23,12 @@ export class BubbleRouteComponent extends SubscriberOxDirective implements OnIni
 
   @Input() routeWidth!: number;
   @Input() bubbles!: Bubble;
+  metricsService: any;
 
   @Input() set  bubbleSetter (bubble : Bubble) {
      this.bubble = bubble;
      if(this.bubbleContainer) {
-      this.bubbleAnimation = new BubbleAnimation(this.bubbleSpeed, this.bubbleAnimationState, this.animationIndex, ANIMATION_PROPERTIES, DELAYS, this.bubble, this.routeIndex,this.bubbleContainer)
+      this.bubbleAnimation = new BubbleAnimation(this.bubbleSpeed, this.bubbleAnimationState, this.animationIndex, ANIMATION_PROPERTIES, DELAYS, this.bubble, this.routeIndex, this.overExercise ,this.bubbleContainer)
       this.bubbleAnimation.bubbleAnimation(this.newBubbleEmitter)
      }
   } 
@@ -37,6 +38,8 @@ export class BubbleRouteComponent extends SubscriberOxDirective implements OnIni
   @Input() bubbleSpeed!: number;
   @Input() animationIndex!: number;
   @Input() answerPerExercise!: number;
+  @Input() overExercise!: boolean;
+  @Input() stopAnimation!: boolean;
   @Output() newBubbleEmitter = new EventEmitter<Replacement>();
   @Output() removeCorrect = new EventEmitter<Bubble>()
 
@@ -63,6 +66,9 @@ export class BubbleRouteComponent extends SubscriberOxDirective implements OnIni
     this.addSubscription(this.composeService.bubbleRestoreAnimation, x => {
       this.restoreBubbles();
     })
+    this.addSubscription(this.challengeService.removeAnimation, x => {
+     this.bubbleAnimation.bubbleAnimationState.pause();
+    })
   }
 
 
@@ -77,7 +83,7 @@ export class BubbleRouteComponent extends SubscriberOxDirective implements OnIni
 
 
   ngAfterViewInit(): void {
-    this.bubbleAnimation = new BubbleAnimation(this.bubbleSpeed, this.bubbleAnimationState, this.animationIndex, ANIMATION_PROPERTIES, DELAYS, this.bubble, this.routeIndex,this.bubbleContainer)
+    this.bubbleAnimation = new BubbleAnimation(this.bubbleSpeed, this.bubbleAnimationState, this.animationIndex, ANIMATION_PROPERTIES, DELAYS, this.bubble, this.routeIndex,this.overExercise ,this.bubbleContainer)
     this.bubbleAnimation.bubbleAnimation(this.newBubbleEmitter);
   }
 

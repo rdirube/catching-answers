@@ -20,6 +20,8 @@ export class CatchingAnswersChallengeService extends ChallengeService<CatchingAn
   public correctAnswersPerExercise:Bubble[] = [];
   public correctAnswerQuantity:number = 0;
   actionToAnswerEmit = new EventEmitter();
+  removeAnimation = new EventEmitter();
+
 
 
   protected generateNextChallenge(subLevel: number): ExerciseOx<CatchingAnswersExercise> {
