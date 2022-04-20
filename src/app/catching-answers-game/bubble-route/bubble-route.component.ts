@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { Bubble, ANIMATION_PROPERTIES, BubbleAnimation, DELAYS, BubbleState, Replacement } from 'src/app/shared/types/types';
+import { Bubble, ANIMATION_PROPERTIES, BubbleAnimation, DELAYS, BubbleState, Replacement, convertPXToVH, Surrender } from 'src/app/shared/types/types';
 import anime from 'animejs'
 import { ChallengeService, GameActionsService } from 'micro-lesson-core';
 import { anyElement, CorrectablePart, duplicateWithJSON, PartCorrectness, PartFormat } from 'ox-types';
@@ -10,6 +10,7 @@ import { timer } from 'rxjs';
 import { CatchingAnswersChallengeService } from 'src/app/shared/services/catching-answers-challenge.service';
 import { ComposeAnimGenerator } from 'ox-animations';
 import { CatchingAnswersComposeService } from 'src/app/shared/services/catching-answers-compose.service';
+import { CatchingAnswersHintService } from 'src/app/shared/services/catching-answers-hint.service';
 
 @Component({
   selector: 'app-bubble-route',
@@ -40,6 +41,8 @@ export class BubbleRouteComponent extends SubscriberOxDirective implements OnIni
   @Input() answerPerExercise!: number;
   @Input() overExercise!: boolean;
   @Input() stopAnimation!: boolean;
+  @Input() isSurrender!: Surrender;
+
   @Output() newBubbleEmitter = new EventEmitter<Replacement>();
   @Output() removeCorrect = new EventEmitter<Bubble>()
 
@@ -48,12 +51,13 @@ export class BubbleRouteComponent extends SubscriberOxDirective implements OnIni
   public bubbleAnimation!: BubbleAnimation;
   public currentBubbles!: Bubble[];
   public bubble!:Bubble;
-  
+
   constructor(private gameActions: GameActionsService<any>,
   private answerService: CatchingAnswersAnswerService,
   private feedBackService: FeedbackOxService,
   private challengeService: CatchingAnswersChallengeService,
-  private composeService:CatchingAnswersComposeService
+  private composeService:CatchingAnswersComposeService,
+  private hintServiceCatch: CatchingAnswersHintService
 ) {
   super();
   this.isSelected = false;
@@ -69,6 +73,17 @@ export class BubbleRouteComponent extends SubscriberOxDirective implements OnIni
     this.addSubscription(this.challengeService.removeAnimation, x => {
      this.bubbleAnimation.bubbleAnimationState.pause();
     })
+    
+    this.addSubscription(this.gameActions.surrender, x => {
+      this.surrender();
+    })
+
+    this.addSubscription(this.hintServiceCatch.firstHint, index => {
+      if(index === this.routeIndex) {
+           this.firstHintAnimation();
+        }   
+    })
+
   }
 
 
@@ -115,22 +130,71 @@ export class BubbleRouteComponent extends SubscriberOxDirective implements OnIni
     } else {
       this.removeCorrect.emit(this.bubble);
       this.challengeService.correctAnswersPerExercise.push(this.bubble);
-      if(this.challengeService.correctAnswersPerExercise.length >= this.answerPerExercise) {
-        this.feedBackService.endFeedback.emit();
-      }
     }
+    this.feedBackService.endFeedback.emit();
+
   }
 
 
   
   private restoreBubbles():void {
+    this.bubble.state = 'neutral';
     anime({
       targets: this.bubbleContainer.nativeElement,
       translateY: '0',
-      duration:0   
+      duration: 0   
     })
   }
 
+
+
+
+
+  private surrender():void {
+    const bubbleYPosition = this.bubbleContainer.nativeElement.getBoundingClientRect().y;
+    this.bubbleAnimation.bubbleAnimationState.pause()
+    anime({
+       targets: this.bubbleContainer.nativeElement,
+        translateY: '-140vh',
+        duration:800,
+        easing:'linear',
+        complete: () => {
+          if(this.isSurrender.state) {
+            this.bubble.data = this.isSurrender.data
+            anime({
+              targets: this.bubbleContainer.nativeElement,
+              translateY: '0',
+              duration:0,
+              complete: () => {
+                this.bubble.state = 'correct';
+                anime({
+                  targets: this.bubbleContainer.nativeElement,
+                  translateY: '-70vh',
+                  duration:2100,
+                  complete: ()=> {
+                    this.challengeService.correctAnswersPerExercise.push(this.bubble);
+                    this.feedBackService.surrenderEnd.emit();
+                  }
+                })
+              }
+            })
+          }
+        }
+    })
+  }
+
+
+  private firstHintAnimation():void {
+   anime({
+    targets: this.bubbleContainer.nativeElement,
+    translateY: '-70vh',
+    duration:1,
+    complete: ()=> {
+      this.bubbleAnimation.bubbleAnimationState.pause();
+    }
+   })
+  }
+  
 
 
 }

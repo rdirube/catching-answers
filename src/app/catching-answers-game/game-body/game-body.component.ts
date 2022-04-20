@@ -1,4 +1,5 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, OnInit, ViewChild } from '@angular/core';
+import anime from 'animejs';
 import { SubscriberOxDirective } from 'micro-lesson-components';
 import { EndGameService, FeedbackOxService, GameActionsService, HintService, MicroLessonMetricsService, SoundOxService } from 'micro-lesson-core';
 import { ComposeAnimGenerator } from 'ox-animations';
@@ -8,7 +9,8 @@ import { filter, take, timer } from 'rxjs';
 import { CatchingAnswersAnswerService } from 'src/app/shared/services/catching-answers-answer.service';
 import { CatchingAnswersChallengeService } from 'src/app/shared/services/catching-answers-challenge.service';
 import { CatchingAnswersComposeService } from 'src/app/shared/services/catching-answers-compose.service';
-import { Bubble, ANIMATION_PROPERTIES, DELAYS, CatchingAnswersExercise, BubbleCreator, BubbleGenerator, Replacement, BubbleState, } from 'src/app/shared/types/types';
+import { CatchingAnswersHintService } from 'src/app/shared/services/catching-answers-hint.service';
+import { Bubble, ANIMATION_PROPERTIES, DELAYS, CatchingAnswersExercise, BubbleCreator, BubbleGenerator, Replacement, BubbleState, Surrender, HintGenerator, } from 'src/app/shared/types/types';
 
 @Component({
   selector: 'app-game-body',
@@ -19,7 +21,6 @@ import { Bubble, ANIMATION_PROPERTIES, DELAYS, CatchingAnswersExercise, BubbleCr
 export class GameBodyComponent extends SubscriberOxDirective implements OnInit, AfterViewInit {
 
   @ViewChild('routesContainer') routesContainer!: ElementRef;
-
 
 
   public bubbles!: Bubble[];
@@ -34,7 +35,9 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
   public answerPerExercise: BubbleCreator[] = [];
   public bubbleGenerator!: BubbleGenerator;
   public overExercise!: boolean;
-  public stopAnimation!:boolean;
+  public stopAnimation!: boolean;
+  public surrenderArray: Surrender[] = [];
+  private hintGenerator!:HintGenerator;
 
 
   constructor(private challengeService: CatchingAnswersChallengeService,
@@ -45,7 +48,8 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
     private endService: EndGameService,
     private feedbackService: FeedbackOxService,
     private answerService: CatchingAnswersAnswerService,
-    private composeService: CatchingAnswersComposeService) {
+    private composeService: CatchingAnswersComposeService,
+    private hintServiceCatch:CatchingAnswersHintService) {
     super();
     this.composeService.setSubscriptions(this.composeService.composeEvent, false)
     this.hintService.usesPerChallenge = 2;
@@ -62,40 +66,45 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
         this.composeService.bubbleRestoreAnimation.emit();
         this.challengeService.removeAnimation.emit();
         this.exercise = exercise.exerciseData;
-          if (exerciseIndex === 1) {
-            this.nextExercise()
+        this.hintService.usesPerChallenge = 2;
+        if (exerciseIndex === 1) {
+          this.nextExercise()
+        }
+        if (exerciseIndex > 1) {
+          if (!allAnswersCorrect) {
+            return
+          } else {
+            this.composeService.composeEvent.emit();
+            this.challengeService.removeAnimation.emit();
           }
-          if (exerciseIndex > 1) {
-            if (!allAnswersCorrect) {
-              return
-            } else {
-              this.composeService.composeEvent.emit();
-              this.challengeService.removeAnimation.emit();
-            }
-          }
-        
+        }
       })
     this.addSubscription(this.composeService.composablesObjectsOut, x => {
-      this.composeService.bubbleRestoreAnimation.emit();
+      this.composeService.bubbleRestoreAnimation.emit();  
       this.nextExercise();
-    
-
-    })
+      
+    }
+    )
     this.addSubscription(this.challengeService.actionToAnswerEmit, x => {
       this.correctablePart();
     })
-
-
-
+    this.addSubscription(this.gameActions.showHint, x => {
+       if(this.hintService.currentUses === 1) {
+         this.hintGenerator.firstHint(this.hintServiceCatch.firstHint)
+       }
+    })
 
   }
 
 
 
+
   nextExercise() {
-    this.answerPerExercise = this.exercise.exercise.bubble.filter(bubble => bubble.isAnswer);
+    this.surrenderArray = []; 
+    this.answerPerExercise = this.exercise.exercise.bubble.filter(bubble => bubble.isAnswer);    
     this.challengeService.correctAnswersPerExercise = [];
     this.routeArray = Array.from(Array(4).keys());
+    this.surrenderArrayGenerator()
     this.statement = this.exercise.exercise.statement.text!;
     this.bubbles = this.exercise.exercise.bubble.map((bubble, i) => {
       return {
@@ -106,6 +115,8 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
     });
     this.bubbleGenerator = new BubbleGenerator(this.bubbles, this.routeArray, this.overExercise);
     this.bubbleGenerator.initialBubbleGenerator();
+    this.hintGenerator = new HintGenerator(this.bubbleGenerator.bubbles, this.bubbleGenerator.bubbleGame);
+
   }
 
 
@@ -115,15 +126,37 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
   }
 
 
+
   ngAfterViewInit(): void {
     this.composeService.addComposable(this.routesContainer.nativeElement, ComposeAnimGenerator.fromBot(), ComposeAnimGenerator.toTop('-140vh'), false);
-
   }
+
 
 
   public tryAnswer() {
     this.answerService.tryAnswer.emit();
   }
+
+
+
+ private surrenderArrayGenerator():void {
+  this.routeArray.forEach((r,i) => {
+    if(i < this.answerPerExercise.length) {
+      this.surrenderArray.push({
+        state:true,
+        id:i,
+        data: this.answerPerExercise[i].content.text
+      })
+    } else {
+      this.surrenderArray.push({
+        state:false
+      })
+    }
+  })
+  this.surrenderArray = shuffle(this.surrenderArray);  
+ }
+
+
 
 
   public bubbleReplacement(replacement: Replacement) {
@@ -137,8 +170,9 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
   }
 
 
+
   removeCorrect(removedBubble: Bubble) {
-    const removedIndex = this.bubbleGenerator.bubbles.findIndex(b => b === removedBubble);
+    const removedIndex = this.bubbleGenerator.bubbles.findIndex(b => b.data === removedBubble.data);
     this.bubbleGenerator.bubbles.splice(removedIndex, 1);
   }
 
@@ -146,16 +180,16 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
 
 
   public correctablePart(): void {
-    const answersArray = duplicateWithJSON(this.bubbles).filter(el => el.isAnswer);
-    const selectedBubbles = this.bubbles.filter(el => el.state === 'correct').concat(this.bubbles.filter(el => el.state === 'selected'));
+    const answersArray = this.bubbleGenerator.bubbles.filter(el => el.isAnswer);
+    const selectedBubbles = this.bubbleGenerator.bubbleGame.filter(el => el.state === 'correct').concat(this.bubbleGenerator.bubbleGame.filter(el => el.state === 'selected'));
     const correctablePart = answersArray.map((ans, i) => {
-      const correctnessToReturn = selectedBubbles[i] ? selectedBubbles[i].data : '';
+      const correctnessToReturn = selectedBubbles.find(x => x.data === ans.data) ? true : false;
       return {
-        correctness: (ans.data === correctnessToReturn ? 'correct' : 'wrong') as PartCorrectness,
+        correctness: (correctnessToReturn ? 'correct' : 'wrong') as PartCorrectness,
         parts: [
           {
             format: 'word-text' as PartFormat,
-            value: correctnessToReturn as string
+            value: ans.data as string
           }
         ]
       }
@@ -163,7 +197,10 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
     this.answerService.currentAnswer = {
       parts: correctablePart as CorrectablePart[]
     }
+    console.log(correctablePart);
+
   }
+
 
 
 
@@ -195,5 +232,11 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
       });
     this.metricsService.addMetric(myMetric as ExerciseData);
   }
+
+
+
+
+ 
+
 
 }

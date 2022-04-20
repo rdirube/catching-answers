@@ -3,7 +3,7 @@ import anime from 'animejs'
 import { anyElement, duplicateWithJSON, Showable, shuffle } from 'ox-types'
 
 
-export type BubbleState = 'neutral' | 'correct' | 'incorrect' | 'selected' ;
+export type BubbleState = 'neutral' | 'correct' | 'incorrect' | 'selected';
 
 
 
@@ -11,7 +11,7 @@ export type BubbleState = 'neutral' | 'correct' | 'incorrect' | 'selected' ;
 export interface Bubble {
   isAnswer: boolean,
   state: BubbleState,
-  data: any
+  data: any,
 }
 
 export interface AnimationProperties {
@@ -22,14 +22,19 @@ export interface AnimationProperties {
   durationDiff: number
 }
 
+export interface Surrender {
+  state:boolean,
+  id?:number,
+  data?:any
+}
 
 export interface CatchingAnswersNivelation {
   exercises: CatchingAnswersExercise[];
 }
 
 export interface Replacement {
-  lastBubble:Bubble,
-  route:number
+  lastBubble: Bubble,
+  route: number
 }
 
 
@@ -48,7 +53,7 @@ export interface CatchingAnswersExercise {
 
 export interface BubbleCreator {
   content: Showable,
-  isAnswer:boolean,
+  isAnswer: boolean,
 }
 
 
@@ -89,9 +94,12 @@ export const ANIMATION_PROPERTIES: AnimationProperties[] = [{
 
 
 
-export const DELAYS: number[] = [500, 1000 ,2000, 0, 2500, 4000, 3000, 3500]
+export const DELAYS: number[] = [500, 1000, 2000, 0, 2500, 4000, 3000, 3500]
 
 
+export function convertPXToVH(px: number): number {
+  return px * (100 / document.documentElement.clientHeight);
+}
 
 
 
@@ -102,13 +110,13 @@ export class BubbleAnimation {
   private bubbleContainer!: ElementRef | undefined;
   private animationProperties!: AnimationProperties[];
   private animationIndex!: number;
-  private delayArray!:number[];
-  private bubble!:Bubble;
-  private routeIndex!:number;
-  private isFinished!:boolean
+  private delayArray!: number[];
+  private bubble!: Bubble;
+  private routeIndex!: number;
+  private isFinished!: boolean
 
 
-  constructor(bubbleSpeed: number, bubbleAnimationState: any, animationIndex: number, animationProperties: AnimationProperties[], delayArray:number[], bubble:Bubble, routeIndex:number, isFinished:boolean ,bubbleContainer?: ElementRef) {
+  constructor(bubbleSpeed: number, bubbleAnimationState: any, animationIndex: number, animationProperties: AnimationProperties[], delayArray: number[], bubble: Bubble, routeIndex: number, isFinished: boolean, bubbleContainer?: ElementRef) {
     this.bubbleSpeed = bubbleSpeed;
     this.bubbleAnimationState = bubbleAnimationState;
     this.bubbleContainer = bubbleContainer;
@@ -142,14 +150,14 @@ export class BubbleAnimation {
         anime({
           targets: this.bubbleContainer!.nativeElement,
           translateY: '0',
-          duration:0
+          duration: 0
         })
-          newBubble.emit({
-            lastBubble:this.bubble,
-            route: this.routeIndex
-          })
-        
-      } 
+        newBubble.emit({
+          lastBubble: this.bubble,
+          route: this.routeIndex
+        })
+
+      }
     })
     this.bubbleAnimationState.play();
   }
@@ -162,15 +170,15 @@ export class BubbleAnimation {
 
 export class BubbleGenerator {
 
-  public bubbles!:Bubble[];
-  public indexToModify!:number;
-  public bubbleGame:Bubble[] = [];
-  public routeArray!:number[];
-  private bubbleAnswerInGame:Bubble[] = [];
-  public init!:boolean;
+  public bubbles!: Bubble[];
+  public indexToModify!: number;
+  public bubbleGame: Bubble[] = [];
+  public routeArray!: number[];
+  private bubbleAnswerInGame: Bubble[] = [];
+  public init!: boolean;
 
 
-  constructor(bubbles:Bubble[],routeArray:number[], init:boolean) {
+  constructor(bubbles: Bubble[], routeArray: number[], init: boolean) {
     this.bubbles = bubbles;
     this.routeArray = routeArray;
     this.init = init
@@ -180,18 +188,20 @@ export class BubbleGenerator {
 
   public initialBubbleGenerator() {
     const isAnswerList = this.bubbles.filter(bubble => bubble.isAnswer);
-    const  answerSelected = anyElement(isAnswerList);
-    this.routeArray.forEach((route,i) => {
-      if(i === 0) {
-         this.bubbleGame.push(answerSelected);
-         this.bubbleAnswerInGame.push(answerSelected);        
+    const answerSelected = anyElement(isAnswerList);
+    const answerSelectedCopy = duplicateWithJSON(answerSelected)
+    this.routeArray.forEach((route, i) => {
+      if (i === 0) {
+        this.bubbleGame.push(answerSelectedCopy);
+        this.bubbleAnswerInGame.push(answerSelected);
       } else {
         const filteredBubbles = this.bubbles.filter(b => !this.bubbleAnswerInGame.includes(b));
         const bubbleToAdd = anyElement(filteredBubbles);
-        if(bubbleToAdd.isAnswer) {
+        const bubbleToAddCopy = duplicateWithJSON(bubbleToAdd)
+        if (bubbleToAdd.isAnswer) {
           this.bubbleAnswerInGame.push(bubbleToAdd);
         }
-        this.bubbleGame.push(bubbleToAdd);
+        this.bubbleGame.push(bubbleToAddCopy);
       }
     })
     this.bubbleGame = shuffle(this.bubbleGame);
@@ -199,25 +209,49 @@ export class BubbleGenerator {
 
 
 
-  public bubbleReplacement(replacement:Replacement) {
-    const filteredBubbles = this.bubbles.filter(b => !this.bubbleAnswerInGame.includes(b) && b !== replacement.lastBubble);
-    const bubbleToAdd = anyElement(filteredBubbles);
+  public bubbleReplacement(replacement: Replacement) {
+    const filteredBubbles = this.bubbles.filter(b => !this.bubbleAnswerInGame.includes(b) && b.data !== replacement.lastBubble.data);
+    const bubbleToReplace = anyElement(filteredBubbles);
+    const bubbleToAdd = duplicateWithJSON(bubbleToReplace);
     const indexLastAnswer = this.bubbleAnswerInGame.findIndex(b => b === replacement.lastBubble);
-    if(!bubbleToAdd.isAnswer && replacement.lastBubble.isAnswer) {
+    if (!bubbleToReplace.isAnswer && replacement.lastBubble.isAnswer) {
       this.bubbleAnswerInGame.splice(indexLastAnswer, 1)
     }
-    else if(bubbleToAdd.isAnswer) {
-      if(replacement.lastBubble.isAnswer) {
-        this.bubbleAnswerInGame.splice(indexLastAnswer,1,bubbleToAdd);
+    else if (bubbleToReplace.isAnswer) {
+      if (replacement.lastBubble.isAnswer) {
+        this.bubbleAnswerInGame.splice(indexLastAnswer, 1, bubbleToReplace);
       } else {
-        this.bubbleAnswerInGame.push(bubbleToAdd);
+        this.bubbleAnswerInGame.push(bubbleToReplace);
       }
     }
-    bubbleToAdd.state = 'neutral' 
-    this.bubbleGame.splice(replacement.route,1,bubbleToAdd);
-    } 
-  
-
-  
+    bubbleToReplace.state = 'neutral'
+    this.bubbleGame.splice(replacement.route, 1, bubbleToAdd);
+  }
 
 } 
+
+
+
+
+
+
+export class HintGenerator {
+  public bubbles!: Bubble[];
+  public bubblesInGame!:Bubble[];
+
+  constructor(bubbles:Bubble[], bubblesInGame:Bubble[]) {
+    this.bubbles = bubbles;
+    this.bubblesInGame = bubblesInGame;
+  }
+  
+
+  public firstHint(animationEmit: EventEmitter<number>):void {
+    const bubbleNotAnswer = this.bubbles.filter(b => !b.isAnswer)
+    const trapsInGame = bubbleNotAnswer.filter(b => this.bubblesInGame.some(bg => b.data === bg.data))
+    const bubbleToFreeze = anyElement(trapsInGame);
+    const routeToFreeze = this.bubblesInGame.findIndex(b => b.data === bubbleToFreeze.data);
+    animationEmit.emit(routeToFreeze);
+  }
+
+
+}

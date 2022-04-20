@@ -51,8 +51,8 @@ export class AppComponent extends BaseMicroLessonApp {
       
       preloader.addResourcesToLoad(this.getGameResourcesToLoad());
       console.log('App component instanciated', this);
-      this.sound.setSoundOn(true);  
-      preloader.loadAll().subscribe(x => this.loaded = true)
+      // this.sound.setSoundOn(true);  
+      // preloader.loadAll().subscribe(x => this.loaded = true)
 }
 
 

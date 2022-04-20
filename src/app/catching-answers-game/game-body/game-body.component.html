@@ -12,7 +12,7 @@
        </mlc-hint-button> 
      </div>
      <div style="width: 100%; height: 100%; position: absolute; z-index: 50;" fxLayout="row" #routesContainer>
-      <app-bubble-route style="width: 100%;" *ngFor="let route of routeArray; let routeIndex = index" [routeIndex]="routeIndex" [bubbleSpeed]="bubblesSpeed" [animationIndex]="animationIndexes[routeIndex]" [answerPerExercise]="answerPerExercise.length" [bubbleSetter]="bubbleGenerator.bubbleGame[routeIndex]" [stopAnimation]="stopAnimation" [overExercise]="overExercise" (removeCorrect)="removeCorrect($event)" (newBubbleEmitter)="bubbleReplacement($event)" fxLayoutAlign="center center"></app-bubble-route>
+      <app-bubble-route style="width: 100%;" *ngFor="let route of routeArray; let routeIndex = index" [routeIndex]="routeIndex" [bubbleSpeed]="bubblesSpeed" [animationIndex]="animationIndexes[routeIndex]" [isSurrender]="surrenderArray[routeIndex]" [answerPerExercise]="answerPerExercise.length" [bubbleSetter]="bubbleGenerator.bubbleGame[routeIndex]" [stopAnimation]="stopAnimation" [overExercise]="overExercise" (removeCorrect)="removeCorrect($event)" (newBubbleEmitter)="bubbleReplacement($event)" fxLayoutAlign="center center"></app-bubble-route>
     </div>
     <div fxLayoutAlign="center center" class="myAbsolute"  style="width:100;height: 52vh;">
       <mlc-loaded-svg style="width: 70vh; height: 65vh;transform: translateX(26vh);" forceViewBoxTo="''"
