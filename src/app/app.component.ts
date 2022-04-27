@@ -23,9 +23,9 @@ export class AppComponent extends BaseMicroLessonApp {
   }
 
 
-  
 
- 
+
+
 
   constructor(preloader: PreloaderOxService, translocoService: TranslocoService, wumboxService: InWumboxService,
     communicationOxService: CommunicationOxService, microLessonCommunicationService: MicroLessonCommunicationService<any>,
@@ -39,37 +39,37 @@ export class AppComponent extends BaseMicroLessonApp {
     super(preloader, translocoService, wumboxService, communicationOxService, microLessonCommunicationService,
       progressService, elementRef, _gameActionsService, endGame,
       i18nService, levelService, http, _challengeService, _appInfoService, _metrics, sound, bridgeFactory);
-      
-      communicationOxService.receiveI18NInfo.subscribe(z => {
-        console.log('i18n', z);
-      });
-      this._gameActionsService.microLessonCompleted.subscribe(__ => {
-        if (resourceStateService.currentState?.value) {
-          microLessonCommunicationService.sendMessageMLToManager(ResourceFinalStateOxBridge, resourceStateService.currentState.value);
-        }
-      });
-      
-      preloader.addResourcesToLoad(this.getGameResourcesToLoad());
-      console.log('App component instanciated', this);
-      // this.sound.setSoundOn(true);  
-      // preloader.loadAll().subscribe(x => this.loaded = true)
-}
+
+    communicationOxService.receiveI18NInfo.subscribe(z => {
+      console.log('i18n', z);
+    });
+    this._gameActionsService.microLessonCompleted.subscribe(__ => {
+      if (resourceStateService.currentState?.value) {
+        microLessonCommunicationService.sendMessageMLToManager(ResourceFinalStateOxBridge, resourceStateService.currentState.value);
+      }
+    });
+
+    preloader.addResourcesToLoad(this.getGameResourcesToLoad());
+    console.log('App component instanciated', this);
+    // this.sound.setSoundOn(true);  
+    // preloader.loadAll().subscribe(x => this.loaded = true)
+  }
 
 
 
-protected getGameResourcesToLoad(): ResourceOx[] {
-  const svgElements: string[] = ['Boton-congelar.svg', 'Boton-copa.svg', 'Boton-correcto.svg', 'Boton-incorrecto.svg', 'Boton-descongelar.svg', 
-  'Boton-flecha.svg', 'Boton-home.svg', 'Boton-pista.svg','Boton-rendirse.svg', 'Boton-sonido-submarino', 'burbuja.svg', 'burbuja-correcto.svg',
-'burbuja-incorrecto.svg','burbuja-blanca.svg' ,'burbuja-seleccion.svg', 'fondo.svg', 'submarino.svg'];
+  protected getGameResourcesToLoad(): ResourceOx[] {
+    const svgElements: string[] = ['Boton-congelar.svg', 'Boton-copa.svg', 'Boton-correcto.svg', 'Boton-incorrecto.svg', 'Boton-descongelar.svg',
+      'Boton-flecha.svg', 'Boton-home.svg', 'Boton-pista.svg', 'Boton-rendirse.svg', 'Boton-sonido-submarino', 'burbuja.svg', 'burbuja-correcto.svg',
+      'burbuja-incorrecto.svg', 'burbuja-blanca.svg', 'burbuja-seleccion.svg', 'fondo.svg', 'submarino.svg','sonido-activado.svg'];
 
-return svgElements.map(x => new ResourceOx('mini-lessons/executive-functions/catching-answers/game/svg/' + x, ResourceType.Svg,
-[ScreenTypeOx.Game], true))
+    return svgElements.map(x => new ResourceOx('mini-lessons/executive-functions/catching-answers/game/svg/' + x, ResourceType.Svg,
+      [ScreenTypeOx.Game], true))
 
-}
+  }
 
 
 
-title = 'catching-answers';
+  title = 'catching-answers';
 
 
 }

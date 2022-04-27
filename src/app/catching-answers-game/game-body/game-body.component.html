@@ -1,35 +1,48 @@
-<div fxFlex="grow" fxLayoutAlign="center center" style="position: relative; background: lightsalmon"> 
-    <div fxFlex="grow" fxFlexFill class="myAbsolute" fxLayout="column">    
-        <mlc-loaded-svg fxFlex="grow" class="myAbsolute" forceViewBoxTo="''"
-        path="mini-lessons/executive-functions/catching-answers/game/svg/fondo.svg">
-      </mlc-loaded-svg>
-      <div fxLayoutAlign="space-between center" style="width:100%; height:13vh; z-index: 100;">
-        <mlc-to-in-game-menu-button [forceNoAnimations]="true" style="width: 13vh;"
-         svgPath="mini-lessons/executive-functions/catching-answers/game/svg/Boton-home.svg">
-       </mlc-to-in-game-menu-button>
-       <mlc-hint-button style="width: 13vh; opacity: 1;"
-         svgPath="mini-lessons/executive-functions/catching-answers/game/svg/Boton-pista.svg">
-       </mlc-hint-button> 
-     </div>
-     <div style="width: 100%; height: 100%; position: absolute; z-index: 50;" fxLayout="row" #routesContainer>
-      <app-bubble-route style="width: 100%;" *ngFor="let route of routeArray; let routeIndex = index" [routeIndex]="routeIndex" [bubbleSpeed]="bubblesSpeed" [animationIndex]="animationIndexes[routeIndex]" [isSurrender]="surrenderArray[routeIndex]" [answerPerExercise]="answerPerExercise.length" [bubbleSetter]="bubbleGenerator.bubbleGame[routeIndex]" [stopAnimation]="stopAnimation" [overExercise]="overExercise" (removeCorrect)="removeCorrect($event)" (newBubbleEmitter)="bubbleReplacement($event)" fxLayoutAlign="center center"></app-bubble-route>
-    </div>
-    <div fxLayoutAlign="center center" class="myAbsolute"  style="width:100;height: 52vh;">
-      <mlc-loaded-svg style="width: 70vh; height: 65vh;transform: translateX(26vh);" forceViewBoxTo="''"
-      path="mini-lessons/executive-functions/catching-answers/game/svg/submarino.svg">
+<div fxFlex="grow" fxLayoutAlign="center center" style="position: relative; background: lightsalmon">
+  <div fxFlex="grow" fxFlexFill class="myAbsolute" fxLayout="column">
+    <mlc-loaded-svg fxFlex="grow" class="myAbsolute" forceViewBoxTo="''"
+      path="mini-lessons/executive-functions/catching-answers/game/svg/fondo.svg">
     </mlc-loaded-svg>
-    <div style="z-index: 30;transform: translate(-41.5vh, 0.5vh); width: 29.5vh; height: 16vh;" fxLayoutAlign="space-evenly center">
-    <ox-text [originalText]="statement!"  fontSize="2.7vh" color="white" font="dinnRegular"></ox-text>
+    <div fxLayoutAlign="space-between center" style="width:100%; height:13vh; z-index: 100;">
+      <mlc-to-in-game-menu-button [forceNoAnimations]="true" style="width: 13vh;"
+        svgPath="mini-lessons/executive-functions/catching-answers/game/svg/Boton-home.svg">
+      </mlc-to-in-game-menu-button>
+      <mlc-hint-button style="width: 13vh; opacity: 1;"
+        svgPath="mini-lessons/executive-functions/catching-answers/game/svg/Boton-pista.svg">
+      </mlc-hint-button>
     </div>
-     </div>
-     
-     <div style=" width: 100%; bottom: 0; position: absolute;z-index: 100;">
+    <div style="width: 100%; height: 100%; position: absolute; z-index: 50;" fxLayout="row" #routesContainer>
+      <app-bubble-route style="width: 100%;" *ngFor="let route of routeArray; let routeIndex = index"
+        [routeIndex]="routeIndex" [animationIndex]="animationIndexes[routeIndex]" [isHint]="hintArray[routeIndex]"
+        [isSurrender]="surrenderArray[routeIndex]" [answerPerExercise]="answerPerExercise.length"
+        [bubbleSetter]="bubbleGenerator.bubbleGame[routeIndex]" [stopAnimation]="stopAnimation"
+        [overExercise]="overExercise" (removeCorrect)="removeCorrect($event)"
+        (newBubbleEmitter)="bubbleReplacement($event)" fxLayoutAlign="center center"></app-bubble-route>
+    </div>
+    <div fxLayoutAlign="center center" class="myAbsolute" style="width:100;height: 37.5vh;">
+      <mlc-loaded-svg style="width: 70vh; height: 65vh;transform: translateX(24.5vh);" forceViewBoxTo="''"
+        path="mini-lessons/executive-functions/catching-answers/game/svg/submarino.svg">
+      </mlc-loaded-svg>
+      <div style="z-index: 30;transform: translate(-43vh, 0.5vh); width: 29.5vh; height: 16vh;"
+        fxLayoutAlign="space-evenly center">
+        <ox-text [originalText]="statement!" fontSize="2.7vh" color="white" font="dinnRegular"></ox-text>
+      </div>
+      <div style="z-index: 30; width: 17vh; height: 16vh; position: absolute; transform: translate(18vh, 2.4vh)" fxLayoutAlign="space-evenly center">
+      <mlc-loaded-svg *ngIf="exercise?.exercise?.statement?.image && thirdHintActivated" [path]="hintImg" style="width: 70%;"></mlc-loaded-svg>
+      <mlc-sound-button  svgPath="mini-lessons/executive-functions/catching-answers/game/svg/sonido-activado.svg" style="width: 45%;" *ngIf="exercise?.exercise?.statement?.audio && thirdHintActivated"
+       (click)="playLoadedSound(exercise.exercise.statement.audio)">
+      </mlc-sound-button>
+      </div>
+    </div>
+
+    <div style=" width: 100%; bottom: 0; position: absolute;z-index: 100;">
       <mlc-footer class="button-menu" style=" width: 97.5%; height: 12vh;"
         trySvg="mini-lessons/executive-functions/catching-answers/game/svg/Boton-correcto.svg"
         surrenderSvg="mini-lessons/executive-functions/catching-answers/game/svg/Boton-rendirse.svg"
         resultsSvg="mini-lessons/executive-functions/catching-answers/game/svg/Boton-copa.svg"
         nextSvg="mini-lessons/executive-functions/catching-answers/game/svg/Boton-flecha.svg"></mlc-footer>
     </div>
-     </div>
-    
+  </div>
+
 </div>
+

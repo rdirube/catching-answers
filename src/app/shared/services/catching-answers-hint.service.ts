@@ -8,6 +8,7 @@ export class CatchingAnswersHintService{
 
 
   firstHint = new EventEmitter<number>()
+  secondHint = new EventEmitter();
 
   constructor() {
     

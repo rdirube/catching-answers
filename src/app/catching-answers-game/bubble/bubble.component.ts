@@ -14,7 +14,6 @@ export class BubbleComponent implements OnInit {
 
   @Input() set  bubbleSetter (bubble : Bubble) {
     this.bubble = bubble;
-    console.log(this.bubble);
  } 
 
 

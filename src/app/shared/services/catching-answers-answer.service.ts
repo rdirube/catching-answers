@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import { AnswerService, GameActionsService, MicroLessonMetricsService } from 'micro-lesson-core';
 import { UserAnswer } from 'ox-types';
 import { CatchingAnswersChallengeService } from './catching-answers-challenge.service';
@@ -7,6 +7,10 @@ import { CatchingAnswersChallengeService } from './catching-answers-challenge.se
   providedIn: 'root'
 })
 export class CatchingAnswersAnswerService extends AnswerService {
+
+   
+  answerCorrection = new EventEmitter();
+
 
   protected override isValidAnswer(answer: UserAnswer): boolean {
     return this.currentAnswer.parts.every(part => part.parts.every(part => part.value !== null))
