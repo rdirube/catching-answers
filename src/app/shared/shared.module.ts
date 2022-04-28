@@ -20,7 +20,6 @@ import { NgoxPostMessageModule } from 'ngox-post-message';
     NgoxPostMessageModule,
     MicroLessonComponentsModule,
     TypographyOxModule,
-    
   ],
 })
 export class SharedModule { }

@@ -153,6 +153,7 @@ export class BubbleAnimation {
         easing: currentAnimation.easing
       }
     })
+    console.log('emitir animation mothafaka')
     this.bubbleAnimationState = anime({
       targets: this.bubbleContainer!.nativeElement,
       translateY: [{ value: '-140vh', duration: bubbleSpeed + currentAnimation.durationDiff, easing: 'linear', delay: isHint ? 0 : currentDelay }],

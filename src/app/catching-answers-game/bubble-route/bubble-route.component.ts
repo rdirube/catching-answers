@@ -135,6 +135,7 @@ export class BubbleRouteComponent extends SubscriberOxDirective implements OnIni
     this.answerService.answerCorrection.emit();
     if (this.bubble.state === 'incorrect') {
       if (this.isHint !== undefined && this.isHint.state) {
+        anime.remove(this.bubbleContainer.nativeElement)
         this.bubbleAnimation.bubbleAnimation(this.newBubbleEmitter, this.bubble.speed / 2, this.isHint.state)
       }
       this.bubbleAnimation.bubbleAnimationState.play();
@@ -170,27 +171,25 @@ export class BubbleRouteComponent extends SubscriberOxDirective implements OnIni
       complete: () => {
         if (bubbleOut.state) {
           this.bubble.data = bubbleOut.data;
+          this.bubble.state = 'neutral';
           this.bubble.isAnswer = bubbleOut.isAnswer as boolean;
           anime({
             targets: this.bubbleContainer.nativeElement,
             translateY: '0',
-            duration: 0,
+            duration: 1,
             complete: () => {
-              this.bubble.state = bubbleState;
+              this.bubble.state =  bubbleState;
+              if (isSurrender) {
+                if(!this.challengeService.correctAnswersPerExercise.find(b => b.data === this.bubble.data)) {
+                  this.challengeService.correctAnswersPerExercise.push(this.bubble);
+                }
+                this.challengeService.surrenderByBubble.emit()
+              }
               anime({
                 targets: this.bubbleContainer.nativeElement,
                 translateY: '-70vh',
                 duration: 2100,
-                complete: () => {
-                  if (isSurrender) {
-                    if(!this.challengeService.correctAnswersPerExercise.find(b => b.data === this.bubble.data)) {
-                      this.challengeService.correctAnswersPerExercise.push(this.bubble);
-                      console.log(this.challengeService.correctAnswersPerExercise)
-
-                    }
-                    this.challengeService.surrenderByBubble.emit()
-                  }
-                }
+                delay:100,
               })
             }
           })

@@ -90,14 +90,17 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
         }
       })
 
+
     this.addSubscription(this.composeService.composablesObjectsOut, x => {
       this.composeService.bubbleRestoreAnimation.emit();
       this.nextExercise();
     })
 
+
     this.addSubscription(this.challengeService.actionToAnswerEmit, x => {
       this.correctablePart();
     })
+
 
     this.addSubscription(this.gameActions.showHint, x => {
       if (this.hintService.currentUses === 1) {
@@ -108,16 +111,23 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
         this.thirdHintActivated = true;
       }
     })
+
+
     this.addSubscription(this.answerService.answerCorrection, x => {
     this.selectBubbleCorrected++;  
+    this.correctablePart();
     if(this.bubbleGenerator.bubbleGame.filter(b => b.state === 'selected').length === 0) {
       this.feedbackService.endFeedback.emit();
       this.selectBubbleCorrected = 0;
     }
     })
+
+
     this.addSubscription(this.challengeService.surrenderByBubble, x => {
      this.surrenderBubbles++;
-     if(this.bubbleGenerator.bubbleGame.filter(b => b.state === 'correct').length <= this.surrenderBubbles) {
+     console.log(this.bubbleGenerator.bubbleGame.filter(b => b.state === 'correct'))
+     console.log(this.surrenderBubbles);
+     if(this.answerPerExercise.length <= this.surrenderBubbles) {
      this.feedBackService.surrenderEnd.emit();
      this.surrenderBubbles = 0;
      }
@@ -231,7 +241,7 @@ public playLoadedSound(sound?: string) {
 
 
   allAnswersCorrect(): boolean {
-    return this.answerPerExercise.length === this.challengeService.correctAnswersPerExercise.length
+    return this.answerPerExercise.length <= this.challengeService.correctAnswersPerExercise.length
   }
 
 
@@ -275,6 +285,7 @@ public playLoadedSound(sound?: string) {
     this.answerService.currentAnswer = {
       parts: correctablePart as CorrectablePart[]
     }
+    console.log(correctablePart);
   }
 
 
