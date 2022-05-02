@@ -62,7 +62,7 @@ export class AppComponent extends BaseMicroLessonApp {
       'Boton-flecha.svg', 'Boton-home.svg', 'Boton-pista.svg', 'Boton-rendirse.svg', 'Boton-sonido-submarino', 'burbuja.svg', 'burbuja-correcto.svg',
       'burbuja-incorrecto.svg', 'burbuja-blanca.svg', 'burbuja-seleccion.svg', 'fondo.svg', 'submarino.svg','sonido-activado.svg'];
 
-    return svgElements.map(x => new ResourceOx('mini-lessons/executive-functions/catching-answers/game/svg/' + x, ResourceType.Svg,
+    return svgElements.map(x => new ResourceOx('catching-answers/svg/' + x, ResourceType.Svg,
       [ScreenTypeOx.Game], true))
 
   }

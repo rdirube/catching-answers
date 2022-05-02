@@ -65,7 +65,7 @@ export class BubbleRouteComponent extends SubscriberOxDirective implements OnIni
       if (this.bubble.state === 'selected') {
         this.answerCorrection()
       } else if (this.bubble.state === 'neutral' && this.isHint !== undefined && this.isHint.state) {
-        this.bubbleAnimation.bubbleAnimation(this.newBubbleEmitter, this.bubble.speed / 2, this.isHint.state)
+        this.bubbleAnimation.bubbleAnimation(this.newBubbleEmitter, this.bubble.speed / 2, this.isHint.state, 2)
       }
     })
 
@@ -79,7 +79,9 @@ export class BubbleRouteComponent extends SubscriberOxDirective implements OnIni
     })
 
     this.addSubscription(this.hintServiceCatch.firstHint, index => {
-      this.bubblesOutIn(this.isHint, 'neutral', false)
+      if(this.bubble.state !== 'correct') {
+        this.bubblesOutIn(this.isHint, 'neutral', false)
+      }
     })
     this.addSubscription(this.hintServiceCatch.secondHint, x => {
       this.slowDownBubble();
@@ -124,7 +126,7 @@ export class BubbleRouteComponent extends SubscriberOxDirective implements OnIni
   private bubbleAnimationInit(): void {
     anime.remove(this.bubbleContainer.nativeElement)
     this.bubbleAnimation = new BubbleAnimation(this.bubble.speed, this.bubbleAnimationState, this.animationIndex, ANIMATION_PROPERTIES, DELAYS, this.bubble, this.routeIndex, this.overExercise, this.bubbleContainer)
-    this.bubbleAnimation.bubbleAnimation(this.newBubbleEmitter, this.bubble.speed, false)
+    this.bubbleAnimation.bubbleAnimation(this.newBubbleEmitter, this.bubble.speed, false,1)
   }
 
 
@@ -135,8 +137,7 @@ export class BubbleRouteComponent extends SubscriberOxDirective implements OnIni
     this.answerService.answerCorrection.emit();
     if (this.bubble.state === 'incorrect') {
       if (this.isHint !== undefined && this.isHint.state) {
-        anime.remove(this.bubbleContainer.nativeElement)
-        this.bubbleAnimation.bubbleAnimation(this.newBubbleEmitter, this.bubble.speed / 2, this.isHint.state)
+        this.bubbleAnimation.bubbleAnimation(this.newBubbleEmitter, this.bubble.speed / 2, this.isHint.state, 2)
       }
       this.bubbleAnimation.bubbleAnimationState.play();
     }
@@ -201,14 +202,21 @@ export class BubbleRouteComponent extends SubscriberOxDirective implements OnIni
   }
 
 
+  public positionPrinter():void {
+   console.log(convertPXToVH(this.bubbleContainer.nativeElement.getBoundingClientRect().bottom))
+  }
+
 
 
 
   private slowDownBubble(): void {
     if (this.bubble.state !== 'correct') {
+      const actualBubblePosition = convertPXToVH(this.bubbleContainer.nativeElement.getBoundingClientRect().top)       ;
+      const posDiff = (-40 - actualBubblePosition);
+      const durationDiff = Math.abs((this.bubble.speed * posDiff) / 140)
+      this.bubble.speed = durationDiff + (0.3 * durationDiff); 
       anime.remove(this.bubbleContainer.nativeElement)
-      this.bubble.speed += (this.bubble.speed * 0.3);
-      this.bubbleAnimation.bubbleAnimation(this.newBubbleEmitter, this.bubble.speed, true)
+      this.bubbleAnimation.bubbleAnimation(this.newBubbleEmitter, this.bubble.speed, true, 2)
     }
   }
 

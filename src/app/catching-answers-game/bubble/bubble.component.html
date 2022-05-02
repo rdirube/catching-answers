@@ -1,10 +1,10 @@
 
 <div style="width: 100%; height: 100%; cursor: pointer;" fxLayoutAlign="center center">
-    <mlc-loaded-svg style="position: absolute;width: 29vh;" path="mini-lessons/executive-functions/catching-answers/game/svg/burbuja-blanca.svg"></mlc-loaded-svg>
-    <mlc-loaded-svg class="bubble" *ngIf="bubble.state === 'neutral'" path="mini-lessons/executive-functions/catching-answers/game/svg/burbuja.svg"></mlc-loaded-svg>
-    <mlc-loaded-svg class="bubble" *ngIf="bubble.state === 'correct'" path="mini-lessons/executive-functions/catching-answers/game/svg/burbuja-correcto.svg"></mlc-loaded-svg>
-    <mlc-loaded-svg class="bubble" *ngIf="bubble.state === 'incorrect'" path="mini-lessons/executive-functions/catching-answers/game/svg/burbuja-incorrecto.svg"></mlc-loaded-svg>
-    <mlc-loaded-svg class="bubble" *ngIf="bubble.state === 'selected'" path="mini-lessons/executive-functions/catching-answers/game/svg/burbuja-seleccion.svg"></mlc-loaded-svg>
+    <mlc-loaded-svg style="position: absolute;width: 29vh;" path="catching-answers/svg/burbuja-blanca.svg"></mlc-loaded-svg>
+    <mlc-loaded-svg class="bubble" *ngIf="bubble.state === 'neutral'" path="catching-answers/svg/burbuja.svg"></mlc-loaded-svg>
+    <mlc-loaded-svg class="bubble" *ngIf="bubble.state === 'correct'" path="catching-answers/svg/burbuja-correcto.svg"></mlc-loaded-svg>
+    <mlc-loaded-svg class="bubble" *ngIf="bubble.state === 'incorrect'" path="catching-answers/svg/burbuja-incorrecto.svg"></mlc-loaded-svg>
+    <mlc-loaded-svg class="bubble" *ngIf="bubble.state === 'selected'" path="catching-answers/svg/burbuja-seleccion.svg"></mlc-loaded-svg>
     <div style="position: absolute;width: 25vh; height: 25vh;" fxLayoutAlign="center center">
         <ox-text [originalText]="bubble.data"  fontSize="2.7vh" color="black" font="dinnRegular" ></ox-text>
     </div>

@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "ml-creators-2"
+  },
+  "targets": {
+    "ml-creators-2": {
+      "hosting": {
+        "catching-answers": [
+          "catching-answers"
+        ]
+      }
+    }
+  }
+}

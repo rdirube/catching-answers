@@ -43,6 +43,7 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
   private selectBubbleCorrected!:number;
   private surrenderBubbles!:number;
   public hintImg!:string;
+  private slowHintActivated!:boolean;
   public thirdHintActivated!:boolean;
 
 
@@ -75,6 +76,7 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
         this.challengeService.removeAnimation.emit();
         this.exercise = exercise.exerciseData;
         this.thirdHintActivated = false;
+        this.slowHintActivated = false;
         this.hintImg = this.exercise.exercise.statement.image as string
         if (exerciseIndex === 1) {
           this.bubblesSpeed = this.challengeService.exerciseConfig.advancedSettings * 1000;
@@ -104,9 +106,11 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
 
     this.addSubscription(this.gameActions.showHint, x => {
       if (this.hintService.currentUses === 1) {
-        this.bubbleOutArrayGenerator(this.hintArray, this.routeArray.length - 1, false, this.exercise.exercise.bubble)
+        this.bubbleOutArrayGenerator(this.hintArray, false, this.exercise.exercise.bubble)
       } else if (this.hintService.currentUses === 2) {
         this.hintServiceCatch.secondHint.emit();
+        this.slowHintActivated = true;
+        console.log(this.hintService.usesPerChallenge);
       } else {
         this.thirdHintActivated = true;
       }
@@ -142,14 +146,16 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
     this.surrenderArray.splice(0, this.surrenderArray.length);;
     this.hintArray.splice(0, this.hintArray.length);
     this.bubbleAnswerInGame.splice(0, this.bubbleAnswerInGame.length);
+    this.thirdHintActivated = false;
+    this.slowHintActivated = false;
     this.hintService.usesPerChallenge = 3;
     this.answerPerExercise = this.exercise.exercise.bubble.filter(bubble => bubble.isAnswer);
     this.challengeService.correctAnswersPerExercise = [];
     this.routeArray = Array.from(Array(this.exercise.exercise.routeQuantity).keys());
-    this.bubbleOutArrayGenerator(this.surrenderArray, this.answerPerExercise.length, true, this.answerPerExercise)
     this.statement = this.exercise.exercise.statement.text!;
-    this.generateNewBubbles()
+    this.generateNewBubbles();
     this.bubbleGenerator.initialBubbleGenerator();
+    this.bubbleOutArrayGenerator(this.surrenderArray,  true, this.answerPerExercise)
     this.hintGenerator = new HintGenerator(this.bubbleGenerator.bubbles, this.bubbleGenerator.bubbleGame, this.routeArray);
   }
 
@@ -172,25 +178,37 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
   }
 
 
+  private bubblesInCondition(indexC1:number,indexC2:number ,numberToCompare:number,bubble: Bubble ,isSurrender:boolean):boolean {
+   const c1 = indexC1 < numberToCompare;
+   const c2 = indexC2 > 0 && bubble.state !== 'correct';
+   return isSurrender ? c1 : c2; 
+  }
 
-  private bubbleOutArrayGenerator(arrayOut: BubbleOut[], iteration: number, isSurrender: boolean, bubblesForMethod: BubbleCreator[]): void {
+
+  private bubbleOutArrayGenerator(arrayOut: BubbleOut[], isSurrender: boolean, bubblesForMethod: BubbleCreator[]): void {
     const bubblesShuffled = shuffle(bubblesForMethod);
     const bubblesToAdd = isSurrender ? bubblesShuffled : this.hintBubbleSelection(bubblesShuffled);
+    let indexToAdd = bubblesToAdd.length;
+    let hintIndex = 0;
     this.routeArray.forEach((r, i) => {
-      if (i < bubblesToAdd.length) {
+      if (this.bubblesInCondition(i , indexToAdd, bubblesToAdd.length, this.bubbleGenerator.bubbleGame[i], isSurrender)) {       
         arrayOut.push({
           state: true,
           id: i,
-          data: bubblesToAdd[i].content.text,
-          isAnswer: bubblesToAdd[i].isAnswer
+          data: bubblesToAdd[isSurrender ? i : hintIndex].content.text,
+          isAnswer: bubblesToAdd[isSurrender ? i : hintIndex].isAnswer
         })
+        if(!isSurrender) {
+          indexToAdd --;
+          hintIndex ++;
+        } 
       } else {
         arrayOut.push({
           state: false
         })
-      }
-     
+      }  
     })
+
     if (!isSurrender) {
       timer(100).subscribe(x => {
         this.hintServiceCatch.firstHint.emit();
@@ -228,7 +246,7 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
 
 
   public bubbleReplacement(replacement: Replacement) {
-    this.bubbleGenerator.bubbleReplacement(replacement);
+    this.bubbleGenerator.bubbleReplacement(replacement, this.slowHintActivated);
   }
 
   
@@ -251,10 +269,10 @@ public playLoadedSound(sound?: string) {
         data: bubble.content.text,
         isAnswer: bubble.isAnswer,
         state: 'neutral',
-        speed: this.bubblesSpeed
+        speed: this.bubblesSpeed 
       }
     });
-    this.bubbleGenerator = new BubbleGenerator(this.bubbles, this.routeArray, this.overExercise, this.bubbleAnswerInGame);
+    this.bubbleGenerator = new BubbleGenerator(this.bubbles, this.routeArray, this.overExercise, this.bubbleAnswerInGame, this.slowHintActivated, this.bubblesSpeed);
   }
 
 

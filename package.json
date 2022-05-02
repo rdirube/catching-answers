@@ -23,6 +23,7 @@
     "@angular/router": "~13.2.0",
     "@ngneat/transloco": "^4.0.0",
     "animejs": "^3.2.1",
+    "firebase": "^9.7.0",
     "howler": "^2.2.3",
     "lottie-web": "^5.9.1",
     "micro-lesson-components": "^1.1.8",

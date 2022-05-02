@@ -1,0 +1,14 @@
+{
+  "hosting": [
+    {
+      "target": "catching-answers",
+      "public": "dist/catching-answers",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ]
+    }
+  ]
+ }
+ 

@@ -142,18 +142,17 @@ export class BubbleAnimation {
 
 
 
-  public bubbleAnimation(newBubble: EventEmitter<Replacement>, bubbleSpeed: number, isHint:boolean) {
+  public bubbleAnimation(newBubble: EventEmitter<Replacement>, bubbleSpeed: number, isHint:boolean, oscilationsRatio:number) {
     const animationsShuffle = shuffle(this.animationProperties)
     const currentAnimation = animationsShuffle[this.animationIndex];
     const shuffleDelays = shuffle(this.delayArray)
     const currentDelay = shuffleDelays[this.animationIndex]
-    const xAxisMovement = Array.from(Array(currentAnimation.xAxisOscilations).keys()).map((z, i) => {
+    const xAxisMovement = Array.from(Array(Math.floor(currentAnimation.xAxisOscilations/oscilationsRatio)).keys()).map((z, i) => {
       return {
         value: (i * z) % 2 === 0 ? currentAnimation.leftToRight ? currentAnimation.xAxisMovement + 'vh' : '-' + currentAnimation.xAxisMovement + 'vh' : currentAnimation.leftToRight ? '-' + currentAnimation.xAxisMovement + 'vh' : currentAnimation.xAxisMovement + 'vh', duration: (bubbleSpeed + currentAnimation.durationDiff) / currentAnimation.xAxisOscilations,
         easing: currentAnimation.easing
       }
     })
-    console.log('emitir animation mothafaka')
     this.bubbleAnimationState = anime({
       targets: this.bubbleContainer!.nativeElement,
       translateY: [{ value: '-140vh', duration: bubbleSpeed + currentAnimation.durationDiff, easing: 'linear', delay: isHint ? 0 : currentDelay }],
@@ -164,11 +163,12 @@ export class BubbleAnimation {
           translateY: '0',
           duration: 0
         })
+        console.log(newBubble)
         newBubble.emit({
           lastBubble: this.bubble,
           route: this.routeIndex
         })
-
+     
       }
     })
   }
@@ -190,14 +190,17 @@ export class BubbleGenerator {
   private bubbleAcc: Bubble[] = [];
   public init!: boolean;
   private isAnswerList!: Bubble[];
-
+  public slowHintActivated!:boolean;
+  public standardSpeed!:number;
 
   
-  constructor(bubbles: Bubble[], routeArray: number[], init: boolean, bubbleAnswerInGame: Bubble[]) {
+  constructor(bubbles: Bubble[], routeArray: number[], init: boolean, bubbleAnswerInGame: Bubble[], slowHintActivated:boolean, standardSpeed:number) {
     this.bubbles = bubbles;
     this.routeArray = routeArray;
     this.init = init;
-    this.bubbleAnswerInGame = bubbleAnswerInGame
+    this.bubbleAnswerInGame = bubbleAnswerInGame;
+    this.slowHintActivated = slowHintActivated;
+    this.standardSpeed = standardSpeed;
   }
 
 
@@ -227,7 +230,7 @@ export class BubbleGenerator {
 
 
 
-  public bubbleReplacement(replacement: Replacement) {
+  public bubbleReplacement(replacement: Replacement, slowHintActivated:boolean) {
     const filteredBubbles = this.bubbles.filter(b => !this.bubbleAnswerInGame.includes(b) && b.data !== replacement.lastBubble.data);
     const candidateToReplace = anyElement(filteredBubbles);
     const bubbleToReplace = this.answerForceBubble(this.bubbleAcc, candidateToReplace)
@@ -243,7 +246,8 @@ export class BubbleGenerator {
         this.bubbleAnswerInGame.push(bubbleToReplace);
       }
     }
-    bubbleToReplace.state = 'neutral'
+    bubbleToReplace.state = 'neutral';
+    bubbleToAdd.speed = slowHintActivated ? this.standardSpeed + (this.standardSpeed * 0.3) : this.standardSpeed;
     this.bubbleGame.splice(replacement.route, 1, bubbleToAdd);
     this.bubbleAcc.push(bubbleToAdd);
   }
