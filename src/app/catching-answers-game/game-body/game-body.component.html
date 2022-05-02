@@ -25,12 +25,12 @@
       </mlc-loaded-svg>
       <div style="z-index: 30;transform: translate(-43vh, 0.5vh); width: 29.5vh; height: 16vh;"
         fxLayoutAlign="space-evenly center">
-        <ox-text [originalText]="statement!" fontSize="2.7vh" color="white" font="dinnRegular"></ox-text>
+        <ox-text [originalText]="statement!" fontSize="2.4vh" color="white" font="dinnRegular"></ox-text>
       </div>
       <div style="z-index: 30; width: 17vh; height: 16vh; position: absolute; transform: translate(18vh, 2.4vh)" fxLayoutAlign="space-evenly center">
       <mlc-loaded-svg *ngIf="exercise?.exercise?.statement?.image && thirdHintActivated" [path]="hintImg" style="width: 70%;"></mlc-loaded-svg>
-      <mlc-sound-button  svgPath="catching-answers/svg/sonido-activado.svg" style="width: 45%;" *ngIf="exercise?.exercise?.statement?.audio && thirdHintActivated"
-       (click)="playLoadedSound(exercise.exercise.statement.audio)">
+      <mlc-sound-button  svgPath="catching-answers/svg/sonido-activado.svg" style="width: 45%; cursor: pointer;" *ngIf="exercise?.exercise?.statement?.audio && thirdHintActivated"
+       (click)="playLoadedSound(exercise.exercise.statement.audio)" >
       </mlc-sound-button>
       </div>
     </div>

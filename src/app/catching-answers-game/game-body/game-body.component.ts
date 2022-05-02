@@ -106,11 +106,12 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
 
     this.addSubscription(this.gameActions.showHint, x => {
       if (this.hintService.currentUses === 1) {
-        this.bubbleOutArrayGenerator(this.hintArray, false, this.exercise.exercise.bubble)
+        timer(100).subscribe(x=> {
+          this.bubbleOutArrayGenerator(this.hintArray, false, this.exercise.exercise.bubble)
+        })
       } else if (this.hintService.currentUses === 2) {
         this.hintServiceCatch.secondHint.emit();
         this.slowHintActivated = true;
-        console.log(this.hintService.usesPerChallenge);
       } else {
         this.thirdHintActivated = true;
       }
@@ -129,8 +130,6 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
 
     this.addSubscription(this.challengeService.surrenderByBubble, x => {
      this.surrenderBubbles++;
-     console.log(this.bubbleGenerator.bubbleGame.filter(b => b.state === 'correct'))
-     console.log(this.surrenderBubbles);
      if(this.answerPerExercise.length <= this.surrenderBubbles) {
      this.feedBackService.surrenderEnd.emit();
      this.surrenderBubbles = 0;
@@ -208,7 +207,6 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
         })
       }  
     })
-
     if (!isSurrender) {
       timer(100).subscribe(x => {
         this.hintServiceCatch.firstHint.emit();

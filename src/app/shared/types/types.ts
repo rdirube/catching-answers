@@ -163,12 +163,10 @@ export class BubbleAnimation {
           translateY: '0',
           duration: 0
         })
-        console.log(newBubble)
         newBubble.emit({
           lastBubble: this.bubble,
           route: this.routeIndex
-        })
-     
+        })  
       }
     })
   }
@@ -269,12 +267,7 @@ export class BubbleGenerator {
       return bubbleToReplace
     }
   }
-
-
 }
-
-
-
 
 
 
@@ -289,6 +282,7 @@ export class HintGenerator {
     this.routeArray = routeArray;
   }
 
+  
 
   public firstHint(animationEmit: EventEmitter<number>): void {
     const bubbleNotAnswer = this.bubbles.filter(b => !b.isAnswer)

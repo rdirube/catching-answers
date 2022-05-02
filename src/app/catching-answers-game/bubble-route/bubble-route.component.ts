@@ -1,8 +1,8 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { Bubble, ANIMATION_PROPERTIES, BubbleAnimation, DELAYS, BubbleState, Replacement, convertPXToVH, BubbleOut } from 'src/app/shared/types/types';
 import anime from 'animejs'
-import { ChallengeService, GameActionsService, HintService } from 'micro-lesson-core';
-import { anyElement, CorrectablePart, duplicateWithJSON, PartCorrectness, PartFormat } from 'ox-types';
+import { ChallengeService, GameActionsService, HintService, SoundOxService } from 'micro-lesson-core';
+import { anyElement, CorrectablePart, duplicateWithJSON, PartCorrectness, PartFormat, ScreenTypeOx } from 'ox-types';
 import { CatchingAnswersAnswerService } from 'src/app/shared/services/catching-answers-answer.service';
 import { SubscriberOxDirective } from 'micro-lesson-components';
 import { FeedbackOxService } from 'micro-lesson-core';
@@ -57,7 +57,8 @@ export class BubbleRouteComponent extends SubscriberOxDirective implements OnIni
     private hintService: HintService,
     private challengeService: CatchingAnswersChallengeService,
     private composeService: CatchingAnswersComposeService,
-    private hintServiceCatch: CatchingAnswersHintService
+    private hintServiceCatch: CatchingAnswersHintService,
+    private soundService: SoundOxService
   ) {
     super();
     this.isSelected = false;
@@ -67,6 +68,9 @@ export class BubbleRouteComponent extends SubscriberOxDirective implements OnIni
       } else if (this.bubble.state === 'neutral' && this.isHint !== undefined && this.isHint.state) {
         this.bubbleAnimation.bubbleAnimation(this.newBubbleEmitter, this.bubble.speed / 2, this.isHint.state, 2)
       }
+      if(this.isHint !== undefined && this.isHint.state) {
+        this.isHint.state = false;
+      } 
     })
 
     this.addSubscription(this.composeService.bubbleRestoreAnimation, x => {
@@ -135,9 +139,10 @@ export class BubbleRouteComponent extends SubscriberOxDirective implements OnIni
   private answerCorrection(): void {
     this.bubble.state = this.bubble.isAnswer ? 'correct' : 'incorrect';
     this.answerService.answerCorrection.emit();
+    this.playLoadedSound(this.bubble.isAnswer ? 'catching-answers/sounds/rightAnswer.mp3' : 'catching-answers/sounds/wrongAnswer.mp3')
     if (this.bubble.state === 'incorrect') {
       if (this.isHint !== undefined && this.isHint.state) {
-        this.bubbleAnimation.bubbleAnimation(this.newBubbleEmitter, this.bubble.speed / 2, this.isHint.state, 2)
+        this.bubbleAnimation.bubbleAnimation(this.newBubbleEmitter, this.bubble.speed / 2, this.isHint.state, 2);
       }
       this.bubbleAnimation.bubbleAnimationState.play();
     }
@@ -170,16 +175,15 @@ export class BubbleRouteComponent extends SubscriberOxDirective implements OnIni
       duration: 800,
       easing: 'linear',
       complete: () => {
-        if (bubbleOut.state) {
-          this.bubble.data = bubbleOut.data;
-          this.bubble.state = 'neutral';
+        if (bubbleOut.state) {       
           this.bubble.isAnswer = bubbleOut.isAnswer as boolean;
           anime({
             targets: this.bubbleContainer.nativeElement,
             translateY: '0',
             duration: 1,
             complete: () => {
-              this.bubble.state =  bubbleState;
+              this.bubble.data = bubbleOut.data;
+              this.bubble.state =  bubbleState;        
               if (isSurrender) {
                 if(!this.challengeService.correctAnswersPerExercise.find(b => b.data === this.bubble.data)) {
                   this.challengeService.correctAnswersPerExercise.push(this.bubble);
@@ -189,8 +193,8 @@ export class BubbleRouteComponent extends SubscriberOxDirective implements OnIni
               anime({
                 targets: this.bubbleContainer.nativeElement,
                 translateY: '-70vh',
-                duration: 2100,
-                delay:100,
+                duration: 1700,
+                delay:500,
               })
             }
           })
@@ -202,11 +206,17 @@ export class BubbleRouteComponent extends SubscriberOxDirective implements OnIni
   }
 
 
+  
   public positionPrinter():void {
    console.log(convertPXToVH(this.bubbleContainer.nativeElement.getBoundingClientRect().bottom))
   }
 
 
+
+  public playLoadedSound(sound?: string) {
+    if(sound)
+    this.soundService.playSoundEffect(sound, ScreenTypeOx.Game);
+  }
 
 
   private slowDownBubble(): void {

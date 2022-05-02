@@ -62,8 +62,12 @@ export class AppComponent extends BaseMicroLessonApp {
       'Boton-flecha.svg', 'Boton-home.svg', 'Boton-pista.svg', 'Boton-rendirse.svg', 'Boton-sonido-submarino', 'burbuja.svg', 'burbuja-correcto.svg',
       'burbuja-incorrecto.svg', 'burbuja-blanca.svg', 'burbuja-seleccion.svg', 'fondo.svg', 'submarino.svg','sonido-activado.svg'];
 
+    
+    const sounds:string[] = ['click.mp3', 'bubble01.mp3', 'bubble02.mp3', 'rightAnswer.mp3', 'woosh.mp3', 'wrongAnswer.mp3', 'clickSurrender.mp3', 'cantClick.mp3',  'hint.mp3'].map(z => 'sounds/' + z);
+ 
+
     return svgElements.map(x => new ResourceOx('catching-answers/svg/' + x, ResourceType.Svg,
-      [ScreenTypeOx.Game], true))
+      [ScreenTypeOx.Game], true)).concat(getResourceArrayFromUrlList(sounds, ResourceType.Audio, false))
 
   }
 
@@ -72,4 +76,8 @@ export class AppComponent extends BaseMicroLessonApp {
   title = 'catching-answers';
 
 
+}
+
+function getResourceArrayFromUrlList(urlList: string[], resourceType: ResourceType, isLocal: boolean): ResourceOx[] {
+  return urlList.map(listElement => new ResourceOx(listElement, resourceType, [ScreenTypeOx.Game], isLocal));
 }
