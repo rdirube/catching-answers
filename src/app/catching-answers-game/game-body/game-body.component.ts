@@ -63,6 +63,7 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
     this.hintService.usesPerChallenge = 3;
     this.composeService.decomposeTime = 950;
     this.composeService.composeTime = 950;
+    this.composeService.composeSoundPath = '';
     this.animationIndexes = shuffle(ANIMATION_PROPERTIES.map((x, i) => i));
     this.selectBubbleCorrected = 0;
     this.surrenderBubbles = 0;
@@ -233,9 +234,11 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
       });
       this.bubbleAnswerInGame.push(answersShuffledPossibleAns[i]);
     }
-    const optionsNoAnswer = bubblesShuffled.filter(b => !b.isAnswer);
-    for (let i = 0; i < 1; i++) {
-      arrayForHint.push(optionsNoAnswer[i])
+    if(arrayForHint.length < this.routeArray.length) {
+      const optionsNoAnswer = bubblesShuffled.filter(b => !b.isAnswer);
+      for (let i = 0; i < 1; i++) {
+        arrayForHint.push(optionsNoAnswer[i])
+      }
     }
     return shuffle(arrayForHint) as BubbleCreator[];
   }
@@ -301,7 +304,6 @@ public playLoadedSound(sound?: string) {
     this.answerService.currentAnswer = {
       parts: correctablePart as CorrectablePart[]
     }
-    console.log(correctablePart);
   }
 
 

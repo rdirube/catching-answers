@@ -64,10 +64,10 @@ export class AppComponent extends BaseMicroLessonApp {
 
     
     const sounds:string[] = ['click.mp3', 'bubble01.mp3', 'bubble02.mp3', 'rightAnswer.mp3', 'woosh.mp3', 'wrongAnswer.mp3', 'clickSurrender.mp3', 'cantClick.mp3',  'hint.mp3'].map(z => 'sounds/' + z);
- 
+    const localSounds = ['selectedInput.mp3']
 
     return svgElements.map(x => new ResourceOx('catching-answers/svg/' + x, ResourceType.Svg,
-      [ScreenTypeOx.Game], true)).concat(getResourceArrayFromUrlList(sounds, ResourceType.Audio, false))
+      [ScreenTypeOx.Game], true)).concat(getResourceArrayFromUrlList(sounds, ResourceType.Audio, false)).concat(localSounds.map(x => new ResourceOx('catching-answers/local-sounds/' + x, ResourceType.Audio,[ScreenTypeOx.Game] ,true)))
 
   }
 

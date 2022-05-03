@@ -113,6 +113,7 @@ export class BubbleRouteComponent extends SubscriberOxDirective implements OnIni
 
   public selectBubble() {
     if (this.bubble.state !== 'correct') {
+      this.playLoadedSound('catching-answers/local-sounds/selectedInput.mp3')
       if (this.bubble.state === 'selected') {
         this.bubble.state = 'neutral';
         this.bubbleAnimation.bubbleAnimationState.play();
@@ -139,7 +140,7 @@ export class BubbleRouteComponent extends SubscriberOxDirective implements OnIni
   private answerCorrection(): void {
     this.bubble.state = this.bubble.isAnswer ? 'correct' : 'incorrect';
     this.answerService.answerCorrection.emit();
-    this.playLoadedSound(this.bubble.isAnswer ? 'catching-answers/sounds/rightAnswer.mp3' : 'catching-answers/sounds/wrongAnswer.mp3')
+    this.playLoadedSound(this.bubble.isAnswer ? 'sounds/rightAnswer.mp3' : 'sounds/wrongAnswer.mp3')
     if (this.bubble.state === 'incorrect') {
       if (this.isHint !== undefined && this.isHint.state) {
         this.bubbleAnimation.bubbleAnimation(this.newBubbleEmitter, this.bubble.speed / 2, this.isHint.state, 2);
@@ -206,10 +207,6 @@ export class BubbleRouteComponent extends SubscriberOxDirective implements OnIni
   }
 
 
-  
-  public positionPrinter():void {
-   console.log(convertPXToVH(this.bubbleContainer.nativeElement.getBoundingClientRect().bottom))
-  }
 
 
 
