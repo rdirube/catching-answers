@@ -4,7 +4,8 @@ import { anyElement, duplicateWithJSON, Showable, shuffle } from 'ox-types'
 
 
 export type BubbleState = 'neutral' | 'correct' | 'incorrect' | 'selected';
-
+export type Randomize = 'Sí' | 'No'
+export type ExPerGame = '' | number;
 
 export interface Bubble {
   isAnswer: boolean,
@@ -31,9 +32,14 @@ export interface BubbleOut {
 }
 
 
+
 export interface CatchingAnswersNivelation {
   exercises: CatchingAnswersExercise[];
-  advancedSettings: number;
+  advancedSettings: {
+    speed:number,
+    isRandom:Randomize,
+    exercisesPerGame:ExPerGame
+  };
 }
 
 
@@ -163,7 +169,7 @@ export class BubbleAnimation {
           translateY: '0',
           duration: 0
         })
-        newBubble.emit({
+            newBubble.emit({
           lastBubble: this.bubble,
           route: this.routeIndex
         })  

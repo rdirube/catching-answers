@@ -195,7 +195,7 @@ export class BubbleRouteComponent extends SubscriberOxDirective implements OnIni
                 targets: this.bubbleContainer.nativeElement,
                 translateY: '-70vh',
                 duration: 1700,
-                delay:500,
+                delay:100,
               })
             }
           })

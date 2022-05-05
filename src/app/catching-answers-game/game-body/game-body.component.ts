@@ -60,7 +60,6 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
     private feedBackService: FeedbackOxService) {
     super();
     this.composeService.setSubscriptions(this.composeService.composeEvent, false)
-    this.hintService.usesPerChallenge = 3;
     this.composeService.decomposeTime = 950;
     this.composeService.composeTime = 950;
     this.composeService.composeSoundPath = '';
@@ -78,9 +77,10 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
         this.exercise = exercise.exerciseData;
         this.thirdHintActivated = false;
         this.slowHintActivated = false;
+        console.log(this.exercise.exercise.statement.image);
         this.hintImg = this.exercise.exercise.statement.image as string
         if (exerciseIndex === 1) {
-          this.bubblesSpeed = this.challengeService.exerciseConfig.advancedSettings * 1000;
+          this.bubblesSpeed = this.challengeService.exerciseConfig.advancedSettings.speed * 1000;
           this.nextExercise()
         }
 
@@ -107,7 +107,7 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
 
     this.addSubscription(this.gameActions.showHint, x => {
       if (this.hintService.currentUses === 1) {
-        timer(100).subscribe(x=> {
+        timer(300).subscribe(x=> {
           this.bubbleOutArrayGenerator(this.hintArray, false, this.exercise.exercise.bubble)
         })
       } else if (this.hintService.currentUses === 2) {
@@ -234,7 +234,8 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
       });
       this.bubbleAnswerInGame.push(answersShuffledPossibleAns[i]);
     }
-    if(arrayForHint.length < this.routeArray.length) {
+    const correctAnswers = this.bubbleGenerator.bubbleGame.filter(b => b.state === 'correct').length;
+    if(arrayForHint.length < (this.routeArray.length - correctAnswers)) {
       const optionsNoAnswer = bubblesShuffled.filter(b => !b.isAnswer);
       for (let i = 0; i < 1; i++) {
         arrayForHint.push(optionsNoAnswer[i])
