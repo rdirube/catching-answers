@@ -24,31 +24,33 @@ export class CatchingAnswersChallengeService extends ChallengeService<CatchingAn
   removeAnimation = new EventEmitter();
   surrenderByBubble = new EventEmitter();
   private exercisePositionList: number[] = [];
-
+  private lastIndexValue:number = -1;
 
   protected generateNextChallenge(subLevel: number): ExerciseOx<CatchingAnswersExercise> {
-   console.log('hola');
-   if(this.exerciseIndex === 0) {
-    this.exercisePositionList.splice(0, this.exercisePositionList.length);
-    const posArray = Array.from(Array(this.exerciseConfig.exercises.length).keys());
-    const shufflePosArray = shuffle(posArray)
-    if(this.exerciseConfig.advancedSettings.exercisesPerGame !== '') {
-      for(let i = 0; i < this.exerciseConfig.advancedSettings.exercisesPerGame ; i++) {
-        this.exercisePositionList.push(shufflePosArray[i])
-      }
-    } else {
-      this.exercisePositionList = this.exerciseConfig.advancedSettings.isRandom === 'Sí' ? shufflePosArray : posArray;
-    }   
-   }
-   const exercise = duplicateWithJSON({
-    exercise:  this.exerciseConfig.exercises[this.exercisePositionList[this.exerciseIndex]].exercise
-  })
-    return new ExerciseOx(
-      exercise as CatchingAnswersExercise, 1 , {
-      maxTimeToBonus: 0,
-      freeTime: 0
-    }, []); 
   
+    if(this.exerciseIndex === 0) {
+      this.exercisePositionList.splice(0, this.exercisePositionList.length);
+      const posArray = Array.from(Array(this.exerciseConfig.exercises.length).keys());
+      const shufflePosArray = shuffle(posArray)
+      if(this.exerciseConfig.advancedSettings.exercisesPerGame !== '') {
+        for(let i = 0; i < this.exerciseConfig.advancedSettings.exercisesPerGame ; i++) {
+          this.exercisePositionList.push(shufflePosArray[i])
+        }
+      } else {
+        this.exercisePositionList = this.exerciseConfig.advancedSettings.isRandom === 'Sí' ? shufflePosArray : posArray;
+      }   
+     }
+     const exercise = duplicateWithJSON({
+      exercise:  this.exerciseConfig.exercises[this.exercisePositionList[this.exerciseIndex]].exercise
+    })
+    this.lastIndexValue = duplicateWithJSON(this.exerciseIndex);
+    console.log("chau") 
+      return new ExerciseOx(
+        exercise as CatchingAnswersExercise, 1 , {
+        maxTimeToBonus: 0,
+        freeTime: 0
+      }, []); 
+
    }
 
 

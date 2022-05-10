@@ -218,6 +218,7 @@ export class BubbleGenerator {
       if (i === 0) {
         this.bubbleGame.push(answerSelectedCopy);
         this.bubbleAnswerInGame.push(answerSelected);
+        this.bubbleAcc.push(answerSelectedCopy)
       } else {
         const filteredBubbles = this.bubbles.filter(b => !this.bubbleAnswerInGame.includes(b));
         const bubbleToAdd = anyElement(filteredBubbles);
@@ -226,6 +227,7 @@ export class BubbleGenerator {
           this.bubbleAnswerInGame.push(bubbleToAdd);
         }
         this.bubbleGame.push(bubbleToAddCopy);
+        this.bubbleAcc.push(bubbleToAddCopy)
       }
     })
     this.bubbleGame = shuffle(this.bubbleGame);
@@ -261,19 +263,17 @@ export class BubbleGenerator {
 
   private answerForceBubble(bubbleAcc: Bubble[], bubbleToReplace: Bubble): Bubble {
     const answersAvaiable = this.isAnswerList.filter(ans => !this.bubbleAnswerInGame.includes(ans));
-    if (bubbleAcc.length >= this.routeArray.length) {
-      const areAnswers = answersAvaiable.length ? answersAvaiable.filter(b => bubbleAcc.some(a => b.data != a.data)) : [];
-      bubbleAcc.shift();
+    const splittedAccumulator = this.bubbleAcc.slice(this.bubbleGame.filter(b => b.state == 'correct' || b.state === 'selected').length); 
+    const areAnswers = answersAvaiable.length ? answersAvaiable.filter(b => splittedAccumulator.some(a => b.data != a.data)) : [];
+    bubbleAcc.shift();
       if (!bubbleToReplace.isAnswer && areAnswers.length) {
         return anyElement(areAnswers);
       } else {
         return bubbleToReplace
       }
-    } else {
-      return bubbleToReplace
-    }
+    } 
   }
-}
+
 
 
 
