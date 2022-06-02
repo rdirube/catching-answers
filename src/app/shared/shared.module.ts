@@ -15,11 +15,11 @@ import { NgoxPostMessageModule } from 'ngox-post-message';
     TypographyOxModule,
     FlexLayoutModule,
   ], exports: [
-    CommonModule,
-    FlexLayoutModule,
-    NgoxPostMessageModule,
-    MicroLessonComponentsModule,
-    TypographyOxModule,
+      CommonModule,
+      FlexLayoutModule,
+      NgoxPostMessageModule,
+      MicroLessonComponentsModule,
+      TypographyOxModule,
   ],
 })
 export class SharedModule { }
