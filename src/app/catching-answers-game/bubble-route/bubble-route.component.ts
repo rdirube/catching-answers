@@ -41,9 +41,12 @@ export class BubbleRouteComponent extends SubscriberOxDirective implements OnIni
   @Input() stopAnimation!: boolean;
   @Input() isSurrender!: BubbleOut;
   @Input() isHint!: BubbleOut;
+  @Input() isOneAnswer!: boolean;
 
   @Output() newBubbleEmitter = new EventEmitter<Replacement>();
   @Output() removeCorrect = new EventEmitter<Bubble>()
+  @Output() removeSelection = new EventEmitter()
+
 
   private bubbleAnimationState!: any;
   private isSelected!: boolean;
@@ -117,6 +120,9 @@ export class BubbleRouteComponent extends SubscriberOxDirective implements OnIni
         this.bubble.state = 'neutral';
         this.bubbleAnimation.bubbleAnimationState.play();
       } else {
+        if(this.isOneAnswer) {
+          this.removeSelection.emit();
+        }
         this.bubble.state = 'selected'
         this.bubbleAnimation.bubbleAnimationState.pause();
         this.challengeService.actionToAnswerEmit.emit();

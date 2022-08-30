@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import anime from 'animejs';
 import { SubscriberOxDirective } from 'micro-lesson-components';
 import { EndGameService, FeedbackOxService, GameActionsService, HintService, MicroLessonMetricsService, SoundOxService } from 'micro-lesson-core';
@@ -11,6 +11,7 @@ import { CatchingAnswersChallengeService } from 'src/app/shared/services/catchin
 import { CatchingAnswersComposeService } from 'src/app/shared/services/catching-answers-compose.service';
 import { CatchingAnswersHintService } from 'src/app/shared/services/catching-answers-hint.service';
 import { Bubble, ANIMATION_PROPERTIES, DELAYS, CatchingAnswersExercise, BubbleCreator, BubbleGenerator, Replacement, BubbleState, BubbleOut, HintGenerator, } from 'src/app/shared/types/types';
+import { BubbleRouteComponent } from '../bubble-route/bubble-route.component';
 
 @Component({
   selector: 'app-game-body',
@@ -21,7 +22,7 @@ import { Bubble, ANIMATION_PROPERTIES, DELAYS, CatchingAnswersExercise, BubbleCr
 export class GameBodyComponent extends SubscriberOxDirective implements OnInit, AfterViewInit {
 
   @ViewChild('routesContainer') routesContainer!: ElementRef;
-
+  @ViewChildren('bubbleRoutes') bubbleRoutes!:QueryList<BubbleRouteComponent>
 
   public bubbles!: Bubble[];
   public bubbleGame!: Bubble[];
@@ -45,7 +46,8 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
   public hintImg!:string;
   private slowHintActivated!:boolean;
   public thirdHintActivated!:boolean;
-
+  public isOneAnswer!:boolean;
+  private routeComponentArr!:BubbleRouteComponent[];
 
   constructor(private challengeService: CatchingAnswersChallengeService,
     private metricsService: MicroLessonMetricsService<any>,
@@ -101,7 +103,11 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
 
 
     this.addSubscription(this.challengeService.actionToAnswerEmit, x => {
-      this.correctablePart();
+      const selectedBubbles = this.bubbleGenerator.bubbleGame.filter(b => b.state === 'selected').length;
+      const answerBubbles = this.bubbleGenerator.bubbles.filter(b => b.isAnswer).length;
+      if(selectedBubbles >= answerBubbles) {
+        this.correctablePart();
+      }
     })
 
 
@@ -155,8 +161,13 @@ export class GameBodyComponent extends SubscriberOxDirective implements OnInit, 
     this.statement = this.exercise.exercise.statement.text!;
     this.generateNewBubbles();
     this.bubbleGenerator.initialBubbleGenerator();
-    this.bubbleOutArrayGenerator(this.surrenderArray,  true, this.answerPerExercise)
+    this.bubbleOutArrayGenerator(this.surrenderArray,  true, this.answerPerExercise);
+    this.isOneAnswer = this.bubbleGenerator.bubbles.filter(b => b.isAnswer).length > 1 ? false : true;
     this.hintGenerator = new HintGenerator(this.bubbleGenerator.bubbles, this.bubbleGenerator.bubbleGame, this.routeArray);
+    timer(100).subscribe(x => {
+      this.routeComponentArr = this.bubbleRoutes.toArray();
+    })
+
   }
 
 
@@ -308,6 +319,11 @@ public playLoadedSound(sound?: string) {
   }
 
 
+  public deselectBubbles() {
+    const bubbleIndexToPlay = this.bubbleGenerator.bubbleGame.findIndex(b => b.state === 'selected');
+    this.routeComponentArr[bubbleIndexToPlay].bubbleAnimation.bubbleAnimationState.play();
+    this.bubbleGenerator.bubbleGame.forEach(b => b.state = 'neutral')
+  }
 
 
   private addMetric(): void {
