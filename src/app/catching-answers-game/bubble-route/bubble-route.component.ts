@@ -54,7 +54,6 @@ export class BubbleRouteComponent extends SubscriberOxDirective implements OnIni
   constructor(private gameActions: GameActionsService<any>,
     private answerService: CatchingAnswersAnswerService,
     private feedBackService: FeedbackOxService,
-    private hintService: HintService,
     private challengeService: CatchingAnswersChallengeService,
     private composeService: CatchingAnswersComposeService,
     private hintServiceCatch: CatchingAnswersHintService,
