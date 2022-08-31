@@ -318,6 +318,11 @@ public playLoadedSound(sound?: string) {
     }
   }
 
+  public correctionSoundDisplay() :void {
+    this.playLoadedSound( this.bubbleGame.filter(b => b.state === 'correct').length === this.exercise.exercise.bubble.filter(b => b.isAnswer).length ? 'sounds/rightAnswer.mp3' : 'sounds/wrongAnswer.mp3')
+
+  }
+
 
   public deselectBubbles() {
     const bubbleIndexToPlay = this.bubbleGenerator.bubbleGame.findIndex(b => b.state === 'selected');

@@ -13,7 +13,8 @@
     </div>
     <div style="width: 100%; height: 100%; position: absolute; z-index: 50;" fxLayout="row" #routesContainer>
       <app-bubble-route #bubbleRoutes style="width: 100%;" *ngFor="let route of routeArray; let routeIndex = index"
-        [routeIndex]="routeIndex" [animationIndex]="animationIndexes[routeIndex]" [isHint]="hintArray[routeIndex]"
+      (correctSoundEvent)="correctionSoundDisplay()"  
+      [routeIndex]="routeIndex" [animationIndex]="animationIndexes[routeIndex]" [isHint]="hintArray[routeIndex]"
         [isSurrender]="surrenderArray[routeIndex]" [answerPerExercise]="answerPerExercise.length"
         [bubbleSetter]="bubbleGenerator.bubbleGame[routeIndex]" [stopAnimation]="stopAnimation"
         [overExercise]="overExercise" (removeCorrect)="removeCorrect($event)" [isOneAnswer]="isOneAnswer"

@@ -46,6 +46,8 @@ export class BubbleRouteComponent extends SubscriberOxDirective implements OnIni
   @Output() newBubbleEmitter = new EventEmitter<Replacement>();
   @Output() removeCorrect = new EventEmitter<Bubble>()
   @Output() removeSelection = new EventEmitter()
+  @Output() correctSoundEvent = new EventEmitter()
+
 
 
   private bubbleAnimationState!: any;
@@ -145,7 +147,7 @@ export class BubbleRouteComponent extends SubscriberOxDirective implements OnIni
   private answerCorrection(): void {
     this.bubble.state = this.bubble.isAnswer ? 'correct' : 'incorrect';
     this.answerService.answerCorrection.emit();
-    this.playLoadedSound(this.bubble.isAnswer ? 'sounds/rightAnswer.mp3' : 'sounds/wrongAnswer.mp3')
+    this.correctSoundEvent.emit()
     if (this.bubble.state === 'incorrect') {
       if (this.isHint !== undefined && this.isHint.state) {
         this.bubbleAnimation.bubbleAnimation(this.newBubbleEmitter, this.bubble.speed / 2, this.isHint.state, 2);
