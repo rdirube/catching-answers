@@ -188,7 +188,7 @@ export class BubbleRouteComponent extends SubscriberOxDirective implements OnIni
             translateY: '0',
             duration: 1,
             complete: () => {
-              this.bubble.data = bubbleOut.data;
+              this.bubble.data = '';
               this.bubble.state =  bubbleState;        
               if (isSurrender) {
                 if(!this.challengeService.correctAnswersPerExercise.find(b => b.data === this.bubble.data)) {
@@ -201,6 +201,10 @@ export class BubbleRouteComponent extends SubscriberOxDirective implements OnIni
                 translateY: '-70vh',
                 duration: 1700,
                 delay:100,
+                complete: () => {
+                  this.bubble.data = bubbleOut.data;
+
+                }
               })
             }
           })
